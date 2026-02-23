@@ -1,0 +1,61 @@
+{% extends "layouts/base-page-fluid.html" %}
+
+{% block title %}
+  Table {{ table_name }} - Records
+{% endblock title %}
+{% block page_pretitle %}
+  DynamoDB
+{% endblock page_pretitle %}
+{% block page_title %}
+  Table {{ table_name }} - Records
+{% endblock page_title %}
+{% block extrastyle %}
+  <style></style>
+{% endblock extrastyle %}
+{% block page_title_actions %}
+{% endblock page_title_actions %}
+{% block page_body %}
+  <table class="table table-striped table-bordered table-hover table-sm"
+         id="dynamodb-table">
+  </table>
+{% endblock page_body %}
+{% block extrajs %}
+  <script type="module">
+    document.addEventListener("DOMContentLoaded", (e) => {
+
+      const table_el = document.getElementById("dynamodb-table");
+      const renderer_str = (data, type, row, conf) => {
+        if (type == "display") {
+          if (typeof data === "object") {
+            return `<pre><code>${JSON.stringify(data, null, 4)}</code></pre>`
+          }
+          return data
+        }
+        return data
+      }
+      fetch("/api/dynamodb/{{ table_name }}/datatable/config/").then(response => response.json()).then(data => {
+        let thead = table_el.querySelector("thead");
+        if (!thead) {
+          thead = document.createElement('thead');
+          table_el.appendChild(thead);
+        }
+        let tr = thead.querySelector("tr");
+        if (!tr) {
+          tr = document.createElement('tr');
+          thead.appendChild(tr);
+        }
+        data.table.columns.forEach((col) => {
+          const th = document.createElement("th");
+          th.innerHTML = col.data;
+          th.setAttribute("title", col.title);
+          tr.appendChild(th);
+          if (col.render) {
+            col.render = eval(col.render);
+          }
+          console.log(col)
+        })
+        const table = new DataTable(table_el, data.table);
+      })
+    })
+  </script>
+{% endblock extrajs %}

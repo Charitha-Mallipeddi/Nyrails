@@ -1,0 +1,28 @@
+{% load crispy_forms_filters %}
+
+<!-- Overlay -->
+<div id="overlay"
+     class="d-none position-fixed top-0 start-0 w-100 h-100 bg-dark opacity-50 slideout-overlay"></div>
+<!-- Slideout Panel -->
+<div id="panel"
+     data-slideout-panel="email-panel"
+     class="position-fixed top-0 end-0 h-100 shadow-lg slideout-panel translate-x-full"
+     style="width: 500px; height: 100vh; overflow-y: auto; z-index: 1050; transition: transform 0.3s ease;">
+  <!-- Close Button -->
+  <button  type="button"
+          class="position-absolute top-0 end-0 m-3 text-secondary btn-close"
+          data-slideout-close
+          aria-label="Close"></button>
+  <!-- Panel Content -->
+  <div class="p-4 pt-5">
+    <h2 class="h2 fw-bold text-dark mb-4">Send Denial Email</h2>
+    <form action="{% url 'refunds:denial_mail' %}" method="post">
+      {% csrf_token %}
+      {{ form.email|as_crispy_field }}
+      {{ form.subject|as_crispy_field }}
+      {{ form.body|as_crispy_field }}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button class="btn btn-primary w-100 my-3" type="submit">Submit</button>
+    </form>
+  </div>
+</div>

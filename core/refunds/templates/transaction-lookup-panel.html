@@ -1,0 +1,35 @@
+{% load crispy_forms_filters %}
+
+<!-- Overlay -->
+<div id="overlay"
+     class="d-none position-fixed top-0 start-0 w-100 h-100 bg-dark opacity-50 slideout-overlay"></div>
+<!-- Slideout Panel -->
+<div id="panel"
+     data-slideout-panel="transaction-lookup-panel"
+     class="position-fixed top-0 end-0 h-100 shadow-lg slideout-panel translate-x-full">
+  <!-- Close Button -->
+  <button type="button"
+          class="position-absolute top-0 end-0 m-3 text-secondary btn-close"
+          data-slideout-close
+          aria-label="Close"></button>
+  <!-- Panel Content -->
+  <div class="p-4 pt-5">
+    <h2 class="h2 fw-bold text-dark mb-4">Transaction Lookup</h2>
+    <form action="." method="get">
+      <div class="d-flex flex-column gap-3 border border-secondary border-opacity-25 p-3 rounded">
+        <div class="d-flex justify-content-between gap-2">
+          <div class="w-50">{{ form.from_date|as_crispy_field }}</div>
+          <div class="w-50">{{ form.to_date|as_crispy_field }}</div>
+        </div>
+        <div>{{ form.transaction_num|as_crispy_field }}</div>
+      </div>
+      <h4 class="fw-bold fs-5 text-center my-3">AND</h4>
+      <div class="d-flex flex-column gap-3 border border-secondary border-opacity-25 p-3 rounded">
+        <div>{{ form.serial_num|as_crispy_field }}</div>
+        <div>{{ form.selling_station|as_crispy_field }}</div>
+        <div>{{ form.selling_device|as_crispy_field }}</div>
+      </div>
+      <button class="btn btn-primary w-100 my-3" type="button">Search</button>
+    </form>
+  </div>
+</div>

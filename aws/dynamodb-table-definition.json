@@ -1,0 +1,90 @@
+{
+  "KeySchema": [
+    {
+      "AttributeName": "ticket-number",
+      "KeyType": "HASH"
+    },
+    {
+      "AttributeName": "ticket-scan-timestamp",
+      "KeyType": "RANGE"
+    }
+  ],
+  "AttributeDefinitions": [
+    {
+      "AttributeName": "ticket-number",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "ticket-scan-timestamp",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "tour",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "conductor-id",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "tkt-type-id",
+      "AttributeType": "S"
+    }
+  ],
+  "GlobalSecondaryIndexes": [
+    {
+      "IndexName": "gsi-tour",
+      "KeySchema": [
+        {
+          "AttributeName": "tour",
+          "KeyType": "HASH"
+        },
+        {
+          "AttributeName": "ticket-scan-timestamp",
+          "KeyType": "RANGE"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "INCLUDE",
+        "NonKeyAttributes": [
+          "conductor-id",
+          "tkt-type-id"
+        ]
+      }
+    },
+    {
+      "IndexName": "gsi-conductor-id",
+      "KeySchema": [
+        {
+          "AttributeName": "conductor-id",
+          "KeyType": "HASH"
+        },
+        {
+          "AttributeName": "ticket-scan-timestamp",
+          "KeyType": "RANGE"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "ALL"
+      }
+    },
+    {
+      "IndexName": "gsi-tkt-type-id",
+      "KeySchema": [
+        {
+          "AttributeName": "tkt-type-id",
+          "KeyType": "HASH"
+        },
+        {
+          "AttributeName": "ticket-scan-timestamp",
+          "KeyType": "RANGE"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "KEYS_ONLY"
+      }
+    }
+  ],
+  "BillingMode": "PAY_PER_REQUEST",
+  "TableName": "scan-event"
+}

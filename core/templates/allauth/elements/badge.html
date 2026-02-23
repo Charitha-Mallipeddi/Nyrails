@@ -1,0 +1,6 @@
+{% load allauth %}
+
+<span class="badge {% if 'success' in attrs.tags %}bg-success text-success-fg{% endif %} {% if 'warning' in attrs.tags %}bg-warning text-warning-fg{% endif %} {% if 'secondary' in attrs.tags %}bg-secondary{% endif %} {% if 'danger' in attrs.tags %}bg-danger{% endif %} {% if 'primary' in attrs.tags %}bg-primary text-primary-fg{% endif %}">
+  {% slot %}
+  {% endslot %}
+</span>

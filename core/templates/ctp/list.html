@@ -1,0 +1,39 @@
+{% extends "layouts/base-page-fluid.html" %}
+
+{% block title %}
+CTP
+{% endblock title %}
+{% block page_title %}
+CTP
+{% endblock page_title %}
+{% block page_pretitle %}
+Dashboard
+{% endblock page_pretitle %}
+{% block page_title_actions %}
+<a href="{% url 'ctp:create' %}" class="btn btn-primary">New CTP</a>
+{% endblock page_title_actions %}
+{% block page_body %}
+<div class="px-2 d-flex justify-content-between gap-5">
+  <div class="table-responsive col-md-4">
+    <table class="table table-bordered table-hover legacy-table">
+      <thead>
+        <tr>
+          <th scope="col">Seq #</th>
+          <th scope="col">Routing Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ctp in ctps %}
+        <tr>
+          <td>
+            <a href="{% url 'ctp:edit' pk=ctp.pk %}" class="text-decoration-underline">
+              {{ ctp.sequence_number }}</a>
+          </td>
+          <td>{{ ctp.routing_status|title }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock page_body %}

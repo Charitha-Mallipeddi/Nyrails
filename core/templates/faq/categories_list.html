@@ -1,0 +1,31 @@
+{% extends "layouts/base-page.html" %}
+
+{% load queryset markdown_extras %}
+
+{% block title %}
+  FAQ | Choose Category
+{% endblock title %}
+{% block page_pretitle %}
+  Frequent Asked Questions
+{% endblock page_pretitle %}
+{% block page_title_actions %}
+{% endblock page_title_actions %}
+{% block page_title %}
+  Select a FAQ category
+{% endblock page_title %}
+{% block page_body %}
+  <div class="row row-cards">
+    {% with sorted_categories=categories|order_by:'slug' %}
+      {% for category in sorted_categories %}
+        <div class="col-md-6 col-lg-3">
+          <div class="card">
+            <a href="{% url 'faq:category_detail' category.slug %}" class="card-header btn btn-primary text-start">
+              <h5 class="mb-0">{{ category.name }}</h5>
+            </a>
+            {% if category.description %}<div class="card-body">{{ category.description|markdown|safe }}</div>{% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    {% endwith %}
+  </div>
+{% endblock page_body %}

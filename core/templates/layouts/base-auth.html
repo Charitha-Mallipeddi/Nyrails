@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+  <head>
+    <title>
+      {% block title %}
+      {% endblock title %}MTA C.O.R.E
+    </title>
+    {% block extrastyle %}
+    {% endblock extrastyle %}
+    {% include 'includes/head.html' %}
+  </head>
+  <body class="{% block bodyclass %}{% endblock bodyclass %} ">
+    <div class="page page-center">
+      <div class="container container-tight py-4">
+        <div class="text-center mb-4">
+          <a href="{% url 'general:home' %}" class="navbar-brand navbar-brand-autodark"><img src="{% static 'images/top_logo_bw.svg' %}" height="50" alt="" /></a>
+        </div>
+        <div class="card card-md">
+          <div class="card-body">
+            <h2 class="h2 text-center mb-4">Login to your account</h2>
+            {% block body %}
+              {% block content %}
+              {% endblock content %}
+            {% endblock body %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Libs JS -->
+    {% include 'includes/scripts.html' %}
+    {% block extrajs %}
+    {% endblock extrajs %}
+  </body>
+</html>

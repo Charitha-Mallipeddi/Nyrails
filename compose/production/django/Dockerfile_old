@@ -1,0 +1,86 @@
+FROM public.ecr.aws/docker/library/node:24-slim AS client-builder
+
+ARG APP_HOME=/app
+WORKDIR ${APP_HOME}
+
+COPY ./package.json ${APP_HOME}
+COPY ./package-lock.json ${APP_HOME}
+RUN npm install && npm cache clean --force
+COPY . ${APP_HOME}
+RUN stat /app/vite/vite.config.js
+RUN npm run build
+
+
+FROM public.ecr.aws/docker/library/python:3.13-slim AS python-build-stage
+
+ARG APP_HOME=/app
+
+WORKDIR ${APP_HOME}
+
+# Install apt packages
+# RUN apt-get update && apt-get install --no-install-recommends -y \
+#         # dependencies for building Python packages
+#         build-essential \
+#         # psycopg dependencies
+#         libpq-dev
+
+COPY requirements/base.txt base.txt
+COPY requirements/production.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY --from=client-builder ${APP_HOME} ${APP_HOME}
+# COPY . .
+
+# Collect static files
+# RUN python manage.py collectstatic --noinput
+
+
+
+# Command to run Gunicorn
+# CMD ["gunicorn", "--bind", "0.0.0.0:8000", "core.wsgi:application"]
+FROM public.ecr.aws/docker/library/python:3.13 AS python-run-stage
+
+ARG APP_HOME=/app
+
+
+WORKDIR ${APP_HOME}
+
+COPY requirements/base.txt base.txt
+COPY requirements/production.txt requirements.txt
+RUN pip install -r requirements.txt
+
+COPY --from=client-builder --chown=django:django ${APP_HOME} ${APP_HOME}
+
+RUN addgroup --system django \
+  && adduser --system --ingroup django django
+
+COPY --chown=django:django ./compose/production/django/entrypoint /entrypoint
+RUN sed -i 's/\r$//g' /entrypoint
+RUN chmod +x /entrypoint
+
+COPY --chown=django:django ./compose/production/django/start /start
+RUN sed -i 's/\r$//g' /start
+RUN chmod +x /start
+
+# Copy the application from the builder
+# COPY --from=python-build-stage --chown=django:django ${APP_HOME} ${APP_HOME}
+
+# explicitly create the media folder before changing ownership below
+RUN mkdir -p ${APP_HOME}/core/media
+
+VOLUME production_django_media:/app/core/media
+
+# make django owner of the WORKDIR directory as well.
+RUN chown django:django -R ${APP_HOME}
+
+# Place executables in the environment at the front of the path
+ENV PATH="/app/.venv/bin:$PATH"
+
+USER django
+
+# Expose the port Gunicorn will listen on
+EXPOSE 8000
+
+# ENTRYPOINT ["/entrypoint"]
+
+CMD [ "/start" ]

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 512 512"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="credit-card-check.svg"
+   inkscape:version="1.4.2 (ebf0e940, 2025-05-08)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.625"
+     inkscape:cx="255.69231"
+     inkscape:cy="256"
+     inkscape:window-width="1920"
+     inkscape:window-height="1021"
+     inkscape:window-x="1920"
+     inkscape:window-y="31"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc. -->
+  <path
+     id="path1-8"
+     style="fill:currentColor"
+     d="m 367.69231,511.69231 c -79.52906,0 -143.99994,-64.471 -143.99994,-144 0,-79.529 64.47088,-144 143.99994,-144 79.52906,0 143.99994,64.471 143.99994,144 0,79.529 -64.47088,144 -143.99994,144 z m 57.4,-204.9 c -7.1,-5.2 -17.1,-3.6 -22.3,3.5 l -53,72.8 -26.7,-26.8 c -6.2,-6.2 -16.4,-6.2 -22.6,0 -6.2,6.2 -6.2,16.4 0,22.6 l 40,40 c 3.3,3.3 7.9,5 12.6,4.7 4.7,-0.3 8.9,-2.8 11.7,-6.6 l 64,-88 c 5.2,-7.1 3.6,-17.1 -3.5,-22.3 z M 64,64 C 28.7,64 0,92.7 0,128 v 32 H 512 V 128 C 512,92.7 483.3,64 448,64 Z M 274.03711,208 H 0 v 176 c 0,35.3 28.7,64 64,64 h 136.83398 c -11.81137,-24.33454 -18.44531,-51.59019 -18.44531,-80.30859 0,-67.75798 36.93365,-127.37321 91.64844,-159.69141 z M 88,336 h 48 c 13.3,0 24,10.7 24,24 0,13.3 -10.7,24 -24,24 H 88 c -13.3,0 -24,-10.7 -24,-24 0,-13.3 10.7,-24 24,-24 z" />
+</svg>

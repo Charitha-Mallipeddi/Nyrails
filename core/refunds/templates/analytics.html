@@ -1,0 +1,291 @@
+{% extends "layouts/base-page-fluid.html" %}
+
+{% load static %}
+
+{% block title %}
+  Refunds Analytics
+{% endblock title %}
+{% block page_title %}
+  Refunds Analytics
+{% endblock page_title %}
+{% block page_pretitle %}
+  Dashboard
+{% endblock page_pretitle %}
+{% block page_title_actions %}
+  <div class="d-flex gap-5">
+    <form class="overflow-auto mw-400"
+          id="railroad-filter"
+          action="{% url 'refunds:analytics' %}"
+          method="get">
+      <div class="btn-group" role="group">
+        <div class="d-flex gap-2 flex-nowrap">
+          {% for c in companies %}
+            <input type="submit"
+                   class="btn-check"
+                   name="railroad-filter"
+                   id="filter-{{ c.short_name }}"
+                   value="{{ c.company_id }}" />
+            <label class="btn btn{% if selected == c.company_id %}-primary selected-railroad{% endif %} text-nowrap"
+                   for="filter-{{ c.short_name }}">{{ c.short_name }}</label>
+          {% endfor %}
+        </div>
+      </div>
+    </form>
+    <a href="{% url 'refunds:list' %}" class="btn btn-outline-primary">Back to List</a>
+  </div>
+{% endblock page_title_actions %}
+{% block page_body %}
+  <div class="row row-deck row-cards">
+    <!-- Summary Cards -->
+    <div class="col-sm-6 col-lg-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="subheader">Total Refunds</div>
+          </div>
+          <div class="h1 mb-3" id="total-refunds-display">{{ total_refunds }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="subheader">Total Amount</div>
+          </div>
+          <div class="h1 mb-3" id="total-amount-display">${{ total_amount|floatformat:2 }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="subheader">Average Refund</div>
+          </div>
+          <div class="h1 mb-3" id="avg-amount-display">
+            {% if total_refunds > 0 %}
+              ${% widthratio total_amount total_refunds 1 %}
+            {% else %}
+              $0.00
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="subheader">Processing Rate</div>
+          </div>
+          <div class="h1 mb-3" id="processing-rate-display">
+            {% if total_refunds > 0 %}
+              {% widthratio status_counts.approved total_refunds 100 %}%
+            {% else %}
+              0%
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row row-deck row-cards mt-2">
+    <!-- Railroad Distribution Chart - Only show when "All" is selected -->
+    <div class="col-lg-4" id="railroad-chart-container">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Railroad Distribution</h3>
+        </div>
+        <div class="card-body">
+          <div id="railroad-chart"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Status Distribution Chart -->
+    <div class="col-lg-4" id="status-chart-container">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Status Distribution</h3>
+        </div>
+        <div class="card-body">
+          <div id="status-chart"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Department Distribution Chart -->
+    <div class="col-lg-4" id="dept-chart-container">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Department Distribution</h3>
+        </div>
+        <div class="card-body">
+          <div id="dept-chart"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock page_body %}
+{% block extrajs %}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const selectedLabel = document.querySelector('.selected-railroad');
+      if (selectedLabel) {
+        selectedLabel.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center'
+        });
+      }
+
+      const allData = {
+        total_refunds: {{ total_refunds }},
+        total_amount: {{ total_amount }},
+        mnr_stats: {
+          count: {{ mnr_stats.count }},
+          amount: {{ mnr_stats.amount }}
+        },
+        lirr_stats: {
+          count: {{ lirr_stats.count }},
+          amount: {{ lirr_stats.amount }}
+        },
+        status_counts: {
+          {% for status, count in status_counts.items %}
+          '{{ status }}': {{ count }}{% if not forloop.last %},{% endif %}
+          {% endfor %}
+        },
+        dept_counts: {
+          {% for dept, count in dept_counts.items %}
+          '{{ dept }}': {{ count }}{% if not forloop.last %},{% endif %}
+          {% endfor %}
+        },
+        railroad_counts: {
+          {% for railroad, count in railroad_counts.items %}
+          '{{ railroad }}': {{ count }}{% if not forloop.last %},{% endif %}
+          {% endfor %}
+        }
+      };
+
+      let statusChart, deptChart, railroadChart;
+
+      // Get the selected railroad from the URL or default to 'all'
+      const urlParams = new URLSearchParams(window.location.search);
+      const selectedRailroad = urlParams.get('railroad-filter') || 'all';
+
+      // Initialize charts
+      function initCharts(data, selectedRailroad) {
+        const railroadContainer = document.getElementById('railroad-chart-container');
+        const statusContainer = document.getElementById('status-chart-container');
+        const deptContainer = document.getElementById('dept-chart-container');
+
+        // Show/hide railroad chart and adjust layout
+        if (selectedRailroad === 'all') {
+          railroadContainer.style.display = 'block';
+          statusContainer.className = 'col-lg-4';
+          deptContainer.className = 'col-lg-4';
+
+          // Railroad Distribution Chart
+          const railroadLabels = Object.keys(data.railroad_counts).map(k => k.toUpperCase());
+          const railroadValues = Object.values(data.railroad_counts);
+
+          if (railroadLabels.length > 0) {
+            if (railroadChart) railroadChart.destroy();
+            railroadChart = new ApexCharts(document.querySelector("#railroad-chart"), {
+              series: railroadValues,
+              chart: {
+                type: 'donut',
+                height: 250
+              },
+              colors: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#17a2b8'],
+              labels: railroadLabels,
+              legend: {
+                position: 'bottom'
+              }
+            });
+            railroadChart.render();
+          }
+        } else {
+          // Hide railroad chart and expand other charts
+          railroadContainer.style.display = 'none';
+          statusContainer.className = 'col-lg-6';
+          deptContainer.className = 'col-lg-6';
+
+          if (railroadChart) {
+            railroadChart.destroy();
+            railroadChart = null;
+          }
+        }
+
+        // Status Distribution Chart
+        const statusLabels = Object.keys(data.status_counts).map(k => k.charAt(0).toUpperCase() + k.slice(1));
+        const statusValues = Object.values(data.status_counts).filter(v => v > 0);
+        const filteredStatusLabels = Object.entries(data.status_counts)
+          .filter(([key, value]) => value > 0)
+          .map(([key, value]) => key.charAt(0).toUpperCase() + key.slice(1));
+
+        if (filteredStatusLabels.length > 0) {
+          if (statusChart) statusChart.destroy();
+          statusChart = new ApexCharts(document.querySelector("#status-chart"), {
+            series: statusValues,
+            chart: {
+              type: 'donut',
+              height: 250
+            },
+            colors: ['#28a745', '#dc3545', '#ffc107', '#17a2b8', '#6f42c1', '#fd7e14'],
+            labels: filteredStatusLabels,
+            legend: {
+              position: 'bottom'
+            }
+          });
+          statusChart.render();
+        }
+
+        // Department Distribution Chart
+        const deptLabels = Object.keys(data.dept_counts);
+        const deptValues = Object.values(data.dept_counts);
+
+        if (deptLabels.length > 0) {
+          if (deptChart) deptChart.destroy();
+          deptChart = new ApexCharts(document.querySelector("#dept-chart"), {
+            series: [{
+              name: 'Refunds',
+              data: deptValues
+            }],
+            chart: {
+              type: 'bar',
+              height: 250
+            },
+            colors: ['#6f42c1'],
+            xaxis: {
+              categories: deptLabels,
+              labels: {
+                rotate: -45,
+                style: {
+                  fontSize: '10px'
+                }
+              }
+            },
+            plotOptions: {
+              bar: {
+                borderRadius: 4,
+                horizontal: false
+              }
+            }
+          });
+          deptChart.render();
+        }
+      }
+
+      // Initialize with all data
+      const initialData = {
+        count: allData.total_refunds,
+        amount: allData.total_amount,
+        status_counts: allData.status_counts,
+        dept_counts: allData.dept_counts,
+        railroad_counts: allData.railroad_counts
+      };
+
+      initCharts(initialData, selectedRailroad);
+    });
+  </script>
+{% endblock extrajs %}

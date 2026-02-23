@@ -1,0 +1,87 @@
+<div class="card" id="card-agency-heatmap">
+  <div class="card-body">
+    <div class="subheader">Heatmap<br/><span class="response-time-range strong small"></span></div>
+  </div>
+  <div class="position-relative apex-chart-wrapper"></div>
+</div>
+<script type="module">
+  document.addEventListener("DOMContentLoaded", function() {
+    const card = document.getElementById("card-agency-heatmap");
+    const chart_el = card.querySelector(".apex-chart-wrapper");
+    const time_range_el = card.querySelector(".response-time-range");
+    if (window.ApexCharts) {
+      const chart = new ApexCharts(chart_el, {
+        chart: {
+          type: "heatmap",
+          fontFamily: "inherit",
+          height: 250,
+          animations: {
+            enabled: false,
+          },
+          zoom: {
+            enabled: true
+          }
+        },
+        series: [],
+        dataLabels: {
+          enabled: false
+        },
+        //colors: ["#008FFB", "#FFFF00"],
+        noData: {
+          text: "Loading..."
+        },
+        yaxis: {
+          tickAmount: 12
+        },
+        xaxis: {
+          labels: {
+            padding: 0,
+            //format: 'MMM dd'
+          },
+          tooltip: {
+            enabled: true,
+          },
+          //type: "datetime",
+        },
+        tooltip: {
+          custom: ({
+            series,
+            seriesIndex,
+            dataPointIndex,
+            w
+          }) => {
+            const value = series[seriesIndex][dataPointIndex];
+            const _series = w.config.series[seriesIndex];
+            const _data = _series.data[dataPointIndex];
+            return `<div class="arrow_box">
+            ${_series.name}: <span>${value}</span><br />
+            MNR: <span>${_data.mnr}</span><br />
+            LIRR: <span>${_data.lirr}</span>
+            </div>`
+          }
+          /*y: {
+            formatter: (value, {series, seriesIndex, dataPointIndex, w}) => {
+              console.log(value, series, seriesIndex, dataPointIndex, w)
+              const _series = w.config.series[seriesIndex];
+              const _data = _series.data[dataPointIndex];
+              console.log(_data, value)
+              return value
+            }
+          }*/
+        }
+      });
+      fetch("/api/ticket/scan/dashboard/card_agency_heatmap/?start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}").then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      }).then(data => {
+        chart.updateOptions(data.chart);
+        const start_date = new Date(data.start_date);
+        const end_date = new Date(data.end_date);
+        time_range_el.innerHTML = `(${mta.format.date_time.format(start_date)} <i class="fa-solid fa-arrow-right"></i> ${mta.format.date_time.format(end_date)})`
+      })
+      chart.render();
+    }
+  });
+</script>

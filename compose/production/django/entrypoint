@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+python3.13 /srv/manage.py collectstatic --noinput
+python3.13 /srv/manage.py migrate
+python3.13 /srv/manage.py loaddata --format jsonl ${APP_HOME}/core/users/fixtures.jsonl.gz
+python3.13 /srv/manage.py auto_createsuperuser --username=system --email=system-rfc@mtahq.org
+python3.13 /srv/manage.py auto_createsuperuser
+python3.13 /srv/manage.py loaddata --format jsonl ${APP_HOME}/core/general/fixtures.jsonl.gz
+python3.13 /srv/manage.py loaddata --format jsonl ${APP_HOME}/core/tariff/fixtures.jsonl.gz
+# python3.13 /srv/manage.py loaddata ${APP_HOME}/core/ticket/fixtures.json.gz
+
+exec "$@"

@@ -1,0 +1,289 @@
+{% extends "layouts/base-page-fluid.html" %}
+
+{% load crispy_forms_filters %}
+
+{% block title %}
+  Create Refund
+{% endblock title %}
+{% block extrahead %}
+  {{form.media}}
+{% endblock extrahead %}
+{% block content %}
+  <div>
+    <main class="container py-5">
+
+      <div class="row">
+
+      <!-- Quick Access -->
+      <div class="col-md-2">
+          <div class="d-flex glass-header flex-column align-items-start gap-2">
+            <a href="#routing_info" class="btn btn-default w-100 nav-link-section" data-section="routing_info">Routing Info <span class="status-icon"></span> </a>
+            <a href="#personal_info" class="btn btn-default w-100 nav-link-section" data-section="personal_info">Personal Info<span class="status-icon"></span> </a>
+            <a href="#reason_info" class="btn btn-default w-100 nav-link-section" data-section="reason_info">Reason Info<span class="status-icon"></span> </a>
+            <a href="#purchase_info" class="btn btn-default w-100 nav-link-section" data-section="purchase_info">Purchase Info<span class="status-icon"></span> </a>
+            <a href="#ticket_info" class="btn btn-default w-100 nav-link-section" data-section="ticket_info">Ticket Info<span class="status-icon"></span> </a>
+            <a href="#auth_info" class="btn btn-default w-100 nav-link-section" data-section="auth_info">Auth Info<span class="status-icon"></span> </a>
+          </div>
+      </div>
+
+      <form id="refund-form" method="post" action="{% url 'refunds:create' %}" class="col-md-10">
+        {% csrf_token %}
+        <!-- Routing Information -->
+        <div class="card mb-2" id="routing_info">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Routing Information</h3>
+              <p class="card-subtitle">Status tracking and departmental assignment.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row g-4">
+              {% if form.originally_entered_by.value != None %}
+                <div class="col-md-8">
+                  {{ form.originally_entered_by.label }} :
+                  {{ form.instance.originally_entered_by.username }}
+                </div>
+              {% endif %}
+              {% if form.date_entered.value != None %}
+                <div class="col-md-8">{{ form.date_entered.label }} : {{ form.date_entered.value }}</div>
+              {% endif %}
+              <div class="col-md-4">{{ form.company|as_crispy_field }}</div>
+              <div class="col-md-4">{{ form.open_date|as_crispy_field }}</div>
+              <div class="col-md-4">{{ form.routing_status|as_crispy_field }}</div>
+            </div>
+            <div class="row g-4 pt-4 border-top border-light">
+              <div class="col-md-6">
+                <div class="mb-3">{{ form.from_dept|as_crispy_field }}</div>
+                <div class="ms-4">{{ form.from_user|as_crispy_field }}</div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">{{ form.route_to_dept|as_crispy_field }}</div>
+                <div class="ms-4">{{ form.route_to_user|as_crispy_field }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Personal Information -->
+        <div class="card my-2" id="personal_info">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Customer Information</h3>
+              <p class="card-subtitle">Verified personal and contact details.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row g-4">
+              <div class="col-md-3">{{ form.first_name|as_crispy_field }}</div>
+              <div class="col-md-3">{{ form.last_name|as_crispy_field }}</div>
+              <div class="col-md-4">{{ form.email|as_crispy_field }}</div>
+              <div class="col-md-4">
+                <div class="d-flex gap-3">
+                  <div class="w-25">{{ form.extension|as_crispy_field }}</div>
+                  {{ form.day_phone|as_crispy_field }}
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="d-flex gap-3">{{ form.country|as_crispy_field }}</div>
+              </div>
+              <div class="col-md-4">{{ form.state|as_crispy_field }}</div>
+              <div class="col-md-12 mt-4">
+                <div class="row g-4">
+                  <div class="col-md-6">{{ form.address_1|as_crispy_field }}</div>
+                  <div class="col-md-3">{{ form.city|as_crispy_field }}</div>
+                  <div class="col-md-3">{{ form.zip_code|as_crispy_field }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Reason And Status Information -->
+        <div class="card my-2" id="reason_info">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Reason And Status Information</h3>
+              <p class="card-subtitle">Audit logs, notification channels, and justification.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            {% if form.status_changed_by.value != None and form.status_changed_by.value != None %}
+              <div class="row g-4 mb-4">
+                <div class="col-6">{{ form.status_changed_by.label }} : {{ form.status_changed_by.value }}</div>
+                <div class="col-6">{{ form.status_date.label }} : {{ form.status_date.value }}</div>
+              </div>
+            {% endif %}
+            <div class="row g-4">
+              <div class="col-md-3">{{ form.current_status|as_crispy_field }}</div>
+              <div class="col-md-3">{{ form.notified_by|as_crispy_field }}</div>
+              <div class="col-md-3">{{ form.cust_notified_by|as_crispy_field }}</div>
+              <div class="col-md-3">{{ form.form_number|as_crispy_field }}</div>
+              <div class="col-md-6">
+                <label class="form-label label-premium"></label>
+                {{ form.refund_reason|as_crispy_field }}
+              </div>
+              <div class="col-md-6">{{ form.reason_text|as_crispy_field }}</div>
+              <div class="col-md-6">{{ form.approval_justification|as_crispy_field }}</div>
+              <div class="col-md-6">{{ form.denial_justification|as_crispy_field }}</div>
+            </div>
+          </div>
+        </div>
+        <!-- Purchase Information  -->
+        <div class="card my-2" id="purchase_info">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Purchase Information</h3>
+              <p class="card-subtitle">Audit logs, notification channels, and justification.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row border-bottom pb-4">
+              <div class="col-md-12">
+                <div class="row">
+                  <div class="col-md-6">{{ form.purchase_type|as_crispy_field }}</div>
+                </div>
+              </div>
+            </div>
+            <div id="purchase-container" class="mt-4">
+              <div id="tss_refund" class="row g-2" hidden>
+                <div class="col-md-6">{{ form.card_type|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.card_number|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.exp_year|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.exp_month|as_crispy_field }}</div>
+                <div class="col-md-12">
+                  <button class="btn btn-default" type="button" data-slideout-open data-target="transaction-lookup-panel">Lookup</button>
+                </div>
+              </div>
+              <div id="etix_refund" class="row g-2" hidden>
+                <div class="col-md-6">{{ form.transaction_reference|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.payment_reference|as_crispy_field }}</div>
+              </div>
+              <div id="group_sales_refund" class="row g-2" hidden>
+                <div class="col-md-6">{{ form.transaction_reference|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.order_reference|as_crispy_field }}</div>
+              </div>
+              <div id="obtims" class="row g-2" hidden>
+                <div class="col-md-6">{{ form.card_type|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.card_number|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.exp_year|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.exp_month|as_crispy_field }}</div>
+              </div>
+               <div id="stims_manual" class="row g-2" hidden>
+                <div class="col-md-6">{{ form.card_type|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.card_number|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.exp_year|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.exp_month|as_crispy_field }}</div>
+              </div>
+              <div id="hampton_holiday" class="row g-2" hidden>
+                <div class="col-md-6">{{ form.merchant_order_id|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.card_type|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form.token|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form.exp_year|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form.exp_month|as_crispy_field }}</div>
+              </div>
+              <div id="mail_ride_refunds" class="row g-2" hidden>
+                <div class="col-md-6">{{ form.merchant_order_id|as_crispy_field }}</div>
+                <div class="col-md-6">{{ form.card_type|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form.token|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form.exp_year|as_crispy_field }}</div>
+                <div class="col-md-4">{{ form.exp_month|as_crispy_field }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Ticket Information  -->
+        <div class="card my-2" id="ticket_info">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Ticket Information</h3>
+              <p class="card-subtitle">Audit logs, notification channels, and justification.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row g-4">
+              <div class="col-md-6">{{ form.purchased_date_time|as_crispy_field }}</div>
+              <div class="col-md-6">{{ form.loose_ticket|as_crispy_field }}</div>
+            </div>
+            <div class="row g-4 mt-3">
+              <div class="col-md-12">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <div class="label-premium">
+                    Refunded Tickets <span class="text-danger">*</span> (Max 10 allowed)
+                  </div>
+                  <div class="d-flex gap-2">
+                    <button type="button" id="add-ticket-btn" class="btn btn-default px-4 py-2">Add Ticket</button>
+                  </div>
+                </div>
+                {{ ticket_formset.management_form }}
+                <div class="row g-2 mb-2" id="ticket-container">
+                  {% for form in ticket_formset.forms %}
+                    <div class="col-12">{% include "ticket-form.html" with form=form %}</div>
+                  {% endfor %}
+                </div>
+                <template id="ticket-row-template">
+                  {% include "ticket-form.html" with form=ticket_formset.empty_form %}
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Authorization Information  -->
+        <div class="card my-2" id="auth_info">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">Authorization Information</h3>
+              <p class="card-subtitle">Audit logs, notification channels, and justification.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="row g-4 mt-3">
+              <div class="col-md-4">{{ form.date_recorded_by_station|as_crispy_field }}</div>
+              <div class="col-md-4">{{ form.sent_for_processing|as_crispy_field }}</div>
+              <div class="col-md-4">{{ form.remarks|as_crispy_field }}</div>
+            </div>
+            <div class="row g-4 mt-3">
+              <div class="col-md-4">{{ form.paid_date|as_crispy_field }}</div>
+              <div class="col-md-4">{{ form.check_number|as_crispy_field }}</div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center gap-2 mt-4">
+              <div class="d-flex justify-content-start gap-4">
+                <div>{{ form.total_amount_of_refund|as_crispy_field }}</div>
+                <div>{{ form.fee|as_crispy_field }}</div>
+              </div>
+              <div class="col-md-4">
+                <p class="form-label label-premium">Settlement Total</p>
+                <div class="display-1 fw-bold" id="final-total-container">
+                  <span id="final-total">0.00</span>
+                </div>
+                {{ form.final_refund.as_hidden }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit Footer -->
+        <div class="glass-header">
+          <div class="max-w-6xl mx-auto py-2">
+            <div class="d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center gap-4">
+                <button class="btn btn-default" type="button" data-slideout-open data-target="letter-panel">Letters</button>
+              </div>
+              <div class="d-flex align-items-center gap-3">
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      </div>
+    </main>
+  </div>
+  {% include "transaction-lookup-panel.html" with form=transaction_lookup_form %}
+{% endblock content %}
+{% block extrajs %}
+  {% load static %}
+
+  <script src="{% static 'js/form.js' %}"></script>
+  <script src="{% static 'js/add.js' %}"></script>
+  <script src="{% static 'js/alert.js' %}"></script>
+  <script src="{% static 'js/slideout.js' %}"></script>
+{% endblock extrajs %}

@@ -1,0 +1,83 @@
+{
+  "paperticket": [
+    [
+      {
+        "ticket-scan-timestamp": "2025-12-01T10:55:54.318545-05:00",
+        "trainId": "1553",
+        "createdAt": "2025-12-01T10:55:55.204545-05:00",
+        "ticket-number": "0999919202512011055",
+        "conductorId": "100180",
+        "tourId": "4930"
+      },
+      {
+        "ticket_type": "30067",
+        "amount": "7.2",
+        "start_connection_service": "0",
+        "valid_from": "2025-12-01T10:55:55.204545-05:00",
+        "ticket_number": "0999919202512011055",
+        "via": null,
+        "count_passenger_category_1": "1",
+        "to_return": null,
+        "valid_to": "2025-12-02T10:55:55.204545-05:00",
+        "end_connection_service": "0",
+        "via_return": null,
+        "from": "7126",
+        "from_return": null,
+        "to": "7164"
+      }
+    ],
+    [
+      {
+        "ticket-scan-timestamp": "2025-12-01T10:55:54.318545",
+        "trainId": "1553",
+        "createdAt": "2025-12-01T10:55:55.204545",
+        "ticket-number": "0999919202512011055",
+        "conductorId": "f658ee43-59aa-480f-a332-4ea806462c49",
+        "tourId": "4930"
+      },
+      {
+        "ticket_type": "30067",
+        "amount": "7200",
+        "start_connection_service": "0",
+        "valid_from": "2025-12-01T10:55:55.204545",
+        "ticket_number": "0999919202512011055",
+        "via": null,
+        "count_passenger_category_1": "1",
+        "to_return": null,
+        "valid_to": "2025-12-02T10:55:55.204545",
+        "end_connection_service": "0",
+        "via_return": null,
+        "from": "7126",
+        "from_return": null,
+        "to": "7164"
+      }
+    ]
+  ],
+  "etix": [
+    [
+      {
+        "ticket-scan-timestamp": "2025-12-01T15:35:46.951664-05:00",
+        "trainId": "608",
+        "createdAt": "2025-12-01T15:35:47.430664-05:00",
+        "ticket-number": "92F26A8110F",
+        "conductorId": "100216",
+        "tourId": "6409"
+      },
+      {
+        "parentProductId": "",
+        "TktOC": "0",
+        "productId": "4264",
+        "activateStart": "2025-12-01T15:35:47.430664-05:00",
+        "eTicketNo": "92F26A8110F",
+        "line": "",
+        "ABI": "com.masabi.ticketcheck.store.UAT",
+        "deviceUtc": "2025-12-01T15:35:47.430664-05:00",
+        "fromStation": "7002",
+        "toStation": "7056",
+        "Act": "4001",
+        "discountCode": "",
+        "price": "1.5"
+      }
+    ]
+  ]
+}

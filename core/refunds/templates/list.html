@@ -1,0 +1,139 @@
+{% extends "layouts/base-page-fluid.html" %}
+
+{% load static %}
+
+{% block title %}
+  Refunds
+{% endblock title %}
+{% block page_title %}
+  Refunds
+{% endblock page_title %}
+{% block page_pretitle %}
+  Dashboard
+{% endblock page_pretitle %}
+{% block page_title_actions %}
+  <a href="{% url 'refunds:analytics' %}"
+     class="btn btn-outline-info me-2">Analytics</a>
+  <a href="{% url 'refunds:create' %}" class="btn btn-primary">New Refund</a>
+{% endblock page_title_actions %}
+{% block page_body %}
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title">Refunds management</h3>
+      <div class="card-actions">
+        <form class="overflow-auto"
+              id="railroad-filter"
+              action="{% url 'refunds:list' %}"
+              method="get"
+              style="max-width: 400px">
+          <div class="btn-group" role="group">
+            <div class="d-flex gap-2 flex-nowrap">
+
+               <a 
+                      class="btn btn-outline-secondary"
+                      href="{% url 'refunds:list' %}">
+                Refresh
+              </a>
+              
+              <button type="button"
+                      class="btn btn-outline-secondary"
+                      data-slideout-open
+                      data-target="filter-panel">
+                Filters
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table id="refunds-table" class="table table-vcenter card-table">
+          <thead>
+            <tr>
+              <th>Railroad</th>
+              <th>Sequence #</th>
+              <th>Customer</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Department</th>
+              <th>Date Entered</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for refund in page_obj %}
+              <tr data-railroad="{{ refund.railroad }}">
+                <td>
+                  <span class="badge bg-{{ refund.railroad|yesno:'blue,green' }} text-white">{{ refund.company.short_name|upper }}</span>
+                </td>
+                <td>
+                  <span class="text-muted">{{ refund.sequence_number }}</span>
+                </td>
+                <td>
+                  <div>
+                    <strong>{{ refund.first_name }} {{ refund.last_name }}</strong>
+                    {% if refund.email %}<div class="text-muted small">{{ refund.email }}</div>{% endif %}
+                  </div>
+                </td>
+                <td class="refund-amount"
+                    data-amount="{{ refund.total_amount_of_refund }}">
+                  ${{ refund.total_amount_of_refund|floatformat:2 }}
+                </td>
+                <td>
+                  {% if refund.current_status|lower == 'approved' %}
+                    <span class="badge badge-outline text-success">{{ refund.current_status|title }}</span>
+                  {% elif refund.current_status|lower == 'rejected' %}
+                    <span class="badge badge-outline text-danger">{{ refund.current_status|title }}</span>
+                  {% else %}
+                    <span class="badge badge-outline text-warning">{{ refund.current_status|title }}</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="text-muted">{{ refund.route_to_dept|title }}</span>
+                </td>
+                <td class="refund-date" data-date="{{ refund.date_entered|date:'c' }}">{{ refund.date_entered|date:'M j, Y' }}</td>
+                <td>
+                  <div class="btn-list flex-nowrap">
+                    <a href="{% url 'refunds:edit' pk=refund.pk %}"
+                       class="btn btn-sm btn-outline-primary">Edit</a>
+                  </div>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="8" class="text-center text-muted py-4">
+                  No refunds found. <a href="{% url 'refunds:create' %}">Create your first refund</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% if page_obj.has_other_pages %}
+      <div class="d-flex justify-content-end align-items-center gap-2 w-100 mt-4">
+        {% if page_obj.has_previous %}
+          <a class="btn btn-primary-outline"
+             href="?page={{ page_obj.previous_page_number }}">Previous</a>
+        {% else %}
+          <button class="btn btn-primary-outline disabled" disabled>Previous</button>
+        {% endif %}
+        <h5>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</h5>
+        {% if page_obj.has_next %}
+          <a class="btn btn-primary-outline"
+             href="?page={{ page_obj.next_page_number }}">Next</a>
+        {% else %}
+          <a class="btn btn-primary-outline disabled" disabled>Next</a>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {% include "refund-filter-panel.html" %}
+
+{% endblock page_body %}
+{% block extrajs %}
+  {% load static %}
+  <script src="{% static 'js/slideout.js' %}"></script>
+{% endblock extrajs %}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>
+      {% block title %}
+      {% endblock title %}
+      MTA C.O.R.E - Centralize Office Revenue Engine
+    </title>
+    {% block extrastyle %}
+    {% endblock extrastyle %}
+    {% include 'includes/head.html' %}
+    {% block extrahead %}
+    {% endblock extrahead %}
+  </head>
+  <body class="{% block bodyclass %} {% endblock bodyclass %}">
+    {% block body %}
+      <div class="page">
+        <!-- Navbar -->
+        {% block navigation %}
+          {% include 'includes/navigation.html' %}
+        {% endblock navigation %}
+        {% block sidebar %}
+          {% include 'includes/sidebar.html' %}
+        {% endblock sidebar %}
+        {% block content %}
+        {% endblock content %}
+      </div>
+    {% endblock body %}
+    {% block modal %}
+    {% endblock modal %}
+    <!-- Tabler Core -->
+    {% block scripts %}
+      {% include 'includes/scripts.html' %}
+    {% endblock scripts %}
+    {% block extrajs %}
+    {% endblock extrajs %}
+  </body>
+</html>

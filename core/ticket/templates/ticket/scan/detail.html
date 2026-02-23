@@ -1,0 +1,293 @@
+{% extends "layouts/base-page-fluid.html" %}
+
+{% block title %}
+  Ticket Scan Detail
+{% endblock title %}
+{% block page_pretitle %}
+  Monitoring - Ticket(s)
+{% endblock page_pretitle %}
+{% block page_title %}
+  <i class="fa-solid fa-qrcode"></i> Scan Detail
+{% endblock page_title %}
+{% block extrastyle %}
+  <style>
+    #datepicker-icon-prepend {
+      width: 220px;
+    }
+  </style>
+{% endblock extrastyle %}
+{% block page_title_actions %}
+  <form name="global-filters" id="global-filters" method="get">
+    <input type="hidden" name="start_date" value="{{ start_date|date:'Y-m-d' }}" />
+    <input type="hidden" name="end_date" value="{{ end_date|date:'Y-m-d' }}" />
+    <div class="row">
+      <div class="col">
+        <div class="input-group">
+          <span class="input-group-text">Train</span>
+          <input type="text"
+                 name="train_id"
+                 value="{% if train_id %}
+                          {{ train_id }}
+                        {% endif %}"
+                 class="form-control" />
+        </div>
+      </div>
+      <div class="col">
+        <div class="input-group">
+          <span class="input-group-text">Tour</span>
+          <input type="text"
+                 name="tour_id"
+                 value="{% if tour_id %}
+                          {{ tour_id }}
+                        {% endif %}"
+                 class="form-control" />
+        </div>
+      </div>
+      <div class="col">
+        <div class="input-group">
+          <span class="input-group-text">Conductor</span>
+          <input type="text"
+                 name="conductor_id"
+                 value="{% if conductor_id %}
+                          {{ conductor_id }}
+                        {% endif %}"
+                 class="form-control" />
+        </div>
+      </div>
+      <div class="col">
+        <div class="input-icon">
+          <span class="input-icon-addon"><i class="fa-solid fa-calendar"></i></span>
+          <input class="form-control"
+                 placeholder="Select a date"
+                 id="datepicker-icon-prepend" />
+        </div>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Apply</button>
+      </div>
+    </div>
+  </form>
+{% endblock page_title_actions %}
+{% block page_body %}
+  <div class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive mb-2">
+        <table class="table table-striped table-hover table-sm table-bordered"
+               id="scan-detail-dt">
+          <thead>
+            <tr>
+              <th rowspan="2">Train</th>
+              <th rowspan="2" title="Conductor">Cond.</th>
+              <th rowspan="2">Tour</th>
+              <th rowspan="2">Scanned On</th>
+              <th rowspan="2">Source</th>
+              <th colspan="4" class="bg-blue-lt text-blue-lt-fg text-center">Ticket</th>
+              <th colspan="2" class="bg-yellow-lt text-yellow-lt-fg text-center">Station</th>
+              <th colspan="2" class="bg-lime-lt text-lime-lt-fg text-center">Valid</th>
+            </tr>
+            <tr>
+              <th class="bg-blue-lt text-blue-lt-fg">Type</th>
+              <th class="bg-blue-lt text-blue-lt-fg">Number</th>
+              <th class="bg-blue-lt text-blue-lt-fg">Amount</th>
+              <th class="bg-blue-lt text-blue-lt-fg" title="Passenger Count">P.Cnt</th>
+              <th class="bg-yellow-lt text-yellow-lt-fg">Origin</th>
+              <th class="bg-yellow-lt text-yellow-lt-fg">Destination</th>
+              <th class="bg-lime-lt text-lime-lt-fg">From</th>
+              <th class="bg-lime-lt text-lime-lt-fg">To</th>
+            </tr>
+          </thead>
+          <tbody class="table-tbody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="modal modal-blur fade show bg-surface-backdrop"
+       tabindex="-1"
+       role="dialog"
+       aria-hidden="true"
+       id="tix-detail-modal">
+    <div class="modal-dialog modal-3 modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Ticket Details</h5>
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci animi beatae delectus deleniti dolorem eveniet facere fuga
+          iste nemo nesciunt nihil odio perspiciatis, quia quis reprehenderit sit tempora totam unde.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn me-auto" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock page_body %}
+{% block extrajs %}
+  <script type="module">
+    const filter_form = document.querySelector("#global-filters");
+    const date_range = flatpickr("#datepicker-icon-prepend", {
+      mode: "range",
+      maxDate: "today",
+      dateFormat: 'Y-m-d',
+      defaultDate: ["{{ start_date|date:'Y-m-d' }}", "{{ end_date|date:'Y-m-d' }}"],
+      onChange: (selectedDates, dateStr, instance) => {
+        const start_date_el = filter_form.querySelector("input[name=start_date]");
+        const end_date_el = filter_form.querySelector("input[name=end_date]");
+        if (selectedDates.length > 1) {
+          start_date_el.value = selectedDates[0].toISOString().substring(0, 10);
+          end_date_el.value = selectedDates[1].toISOString().substring(0, 10);
+        }
+        console.log(selectedDates);
+        console.log(start_date_el, end_date_el);
+
+      }
+    })
+    const renderers = {
+      date_time: DataTable.render.datetime(),
+      tx_source: (data, type, row) => {
+        if (type == "display" && row.source) {
+          return `<i class="${row.source.icon || ''}"></i>${data}`
+        }
+        return data
+      },
+      station: (data, type, row) => {
+        if (type == "display") {
+          return `<i class="line-box ${data.line_class_name || ''}"></i>${data.description}`
+        }
+        return data
+      },
+      tour: (data, type, row) => {
+        if (type == "display") {
+          const form_data = new FormData(document.getElementById("global-filters"));
+          form_data.set("conductor_id", "");
+          form_data.set("train_id", "");
+          form_data.set("tour_id", data);
+          const search_params = new URLSearchParams(form_data);
+          return `<a href="?${search_params.toString()}">${data}</a>`;
+        }
+        return data
+      },
+      train: (data, type, row) => {
+        if (type == "display") {
+          const form_data = new FormData(document.getElementById("global-filters"));
+          form_data.set("conductor_id", "");
+          form_data.set("tour_id", "");
+          form_data.set("train_id", data);
+          const search_params = new URLSearchParams(form_data);
+          return `<a href="?${search_params.toString()}">${data}</a>`;
+        }
+        return data
+      },
+      conductor: (data, type, row) => {
+        if (type == "display") {
+          const form_data = new FormData(document.getElementById("global-filters"));
+          form_data.set("tour_id", "");
+          form_data.set("train_id", "");
+          form_data.set("conductor_id", data);
+          const search_params = new URLSearchParams(form_data);
+          return `<a href="?${search_params.toString()}">${data}</a>`;
+        }
+        return data
+      },
+      ticket: (data, type, row) => {
+        if (type == "display") {
+          return `<a href="#" class="tix-detail-btn">${data}</a>`;
+        }
+        return data
+      }
+    }
+    const tix_detail_modal = new tabler.Modal('#tix-detail-modal', {});
+    const dt = new DataTable("#scan-detail-dt", {
+      ajax: {
+        url: "/api/ticket/scan/?format=datatables",
+        data: (d) => {
+          const formData = new FormData(filter_form);
+          const dataObject = Object.fromEntries(formData.entries());
+          Object.assign(d, dataObject);
+        }
+      },
+
+      columns: [{
+        "data": "train_id",
+        render: renderers.train
+      }, {
+        "data": "conductor_id",
+        render: renderers.conductor
+      }, {
+        "data": "tour_id",
+        render: renderers.tour
+      }, {
+        "data": "scanned_on",
+        render: mta.datatable.renderer.date_time
+      }, {
+        "data": "source.name",
+        render: renderers.tx_source
+      }, {
+        "data": "ticket.sales_packet.description",
+        name: "ticket__sales_packet__description",
+        "className": "small"
+      }, {
+        "data": "ticket.number",
+        name: "ticket__number",
+        render: renderers.ticket
+      }, {
+        "data": "ticket.amount",
+        render: mta.datatable.renderer.usd
+      }, {
+        "data": "ticket.count"
+      }, {
+        "data": "ticket.from_station",
+        name: "ticket__from_station__description",
+        render: renderers.station
+      }, {
+        "data": "ticket.to_station",
+        name: "ticket__to_station__description",
+        render: renderers.station
+      }, {
+        "data": "ticket.valid_from",
+        render: mta.datatable.renderer.date_time
+      }, {
+        "data": "ticket.valid_to",
+        render: mta.datatable.renderer.date_time
+      }],
+      columnDefs: [{
+        target: [5, 6, 7, 8],
+        className: "table-info"
+      }, {
+        target: [9, 10],
+        className: "table-warning"
+      }, {
+        target: [11, 12],
+        className: "table-success"
+      }, ],
+      order: [
+        [3, 'desc']
+      ],
+      rowId: "id",
+      serverSide: true
+    })
+    dt.on("click", ".tix-detail-btn", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log(e);
+      const tr = e.target.parentNode.parentNode;
+      const row = dt.row(tr);
+      const data = row.data();
+      console.log(row, row.data());
+      fetch(`/ticket/${data.ticket.id}/modal`).then((response) => {
+        return response.text()
+      }).then((html) => {
+        const _body = tix_detail_modal._dialog.querySelector(".modal-body");
+        _body.innerHTML = html;
+        tix_detail_modal.show();
+      })
+      console.log(tix_detail_modal);
+      //tix_detail_modal.show();
+    })
+  </script>
+{% endblock extrajs %}

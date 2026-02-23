@@ -1,0 +1,51 @@
+{% load humanize static %}
+<div class="row"><div class="col-12"><img src="{% static top_logo %}" class="mx-auto d-block" style="width:100px;"/></div></div>
+
+<dl class="row">
+  <dt class="col-sm-3"></dt>
+  <dd class="col-sm-9"></dd>
+  {% if object.form == 'paperticket' %}
+  <dt class="col-sm-3">Number</dt>
+  <dd class="col-sm-9">{{ object.paperticket.number }}</dd>
+  <dt class="col-sm-3">Amount</dt>
+  <dd class="col-sm-9">$ {{ object.paperticket.amount|floatformat:"2"|intcomma }}</dd>
+  <dt class="col-sm-3">From</dt>
+  <dd class="col-sm-9">{{ object.paperticket.from_station }}</dd>
+  <dt class="col-sm-3">To</dt>
+  <dd class="col-sm-9">{{ object.paperticket.to_station }}</dd>
+  <dt class="col-sm-3">Valid From</dt>
+  <dd class="col-sm-9">{{ object.paperticket.valid_from }}</dd>
+  <dt class="col-sm-3">Valid To</dt>
+  <dd class="col-sm-9">{{ object.paperticket.valid_to }}</dd>
+  <dt class="col-sm-3">Via Station</dt>
+  <dd class="col-sm-9">{{ object.paperticket.via_station }}</dd>
+  <dt class="col-sm-3">Via Return Station</dt>
+  <dd class="col-sm-9">{{ object.paperticket.via_return }}</dd>
+  <dt class="col-sm-3">Count Passenger Category 1</dt>
+  <dd class="col-sm-9">{{ object.paperticket.count_passenger_category_1 }}</dd>
+  <dt class="col-sm-3">Start Conn. Service</dt>
+  <dd class="col-sm-9">{{ object.paperticket.start_connection_service }}</dd>
+  <dt class="col-sm-3">End Conn. Service</dt>
+  <dd class="col-sm-9">{{ object.paperticket.end_connection_service }}</dd>
+  <dt class="col-sm-3">Ticket Type</dt>
+  <dd class="col-sm-9">{{ object.paperticket.ticket_type }}</dd>
+  {% else %}
+  <dt class="col-sm-3">E Ticket No</dt>
+  <dd class="col-sm-9">{{ object.etixticket.e_ticket_no }}</dd>
+  <dt class="col-sm-3">Price</dt>
+  <dd class="col-sm-9">$ {{ object.etixticket.price|floatformat:"2"|intcomma }}</dd>
+  <dt class="col-sm-3">Discount Code</dt>
+  <dd class="col-sm-9">{{ object.etixticket.discount_code }}</dd>
+  <dt class="col-sm-3">From Station</dt>
+  <dd class="col-sm-9">{{ object.etixticket.from_station }}</dd>
+  <dt class="col-sm-3">To Station</dt>
+  <dd class="col-sm-9">{{ object.etixticket.to_station }}</dd>
+  <dt class="col-sm-3">Activate Start</dt>
+  <dd class="col-sm-9">{{ object.etixticket.activate_start }}</dd>
+  <dt class="col-sm-3">Device UTC</dt>
+  <dd class="col-sm-9">{{ object.etixticket.device_utc }}</dd>
+  <dt class="col-sm-3">ACT</dt>
+  <dd class="col-sm-9">{{ object.etixticket.get_act_display }}</dd>
+
+  {% endif %}
+</dl>

@@ -1,0 +1,177 @@
+<style>
+  .highlight {
+    background-color: transparent;
+    animation: highlightRow 10s ease-in-out;
+    color: black;
+  }
+  .highlight a {
+    text-shadow: 1px 1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, -1px -1px 0 #fff, 1px 0px 0 #fff, 0px 1px 0 #fff, -1px 0px 0 #fff, 0px -1px 0 #fff, 2px 2px 2px rgba(255,255,255,0);
+  }
+
+  @keyframes highlightRow {
+    0% {
+      background-color: var(--tblr-primary);
+      color: white;
+    }
+
+    75% {
+      background-color: var(--tblr-primary);
+      color: white;
+    }
+
+    100% {
+      background-color: transparent;
+      color: black;
+    }
+  }
+
+  .card-scan-table-progress {
+    height: 1px;
+  }
+
+  .card-scan-table-progress .progress-bar {
+    width: 100%;
+    transition: width 0ms linear;
+  }
+
+  .card-scan-table-progress.active .progress-bar {
+    width: 0%;
+    transition-delay: 0ms !important;
+    transition-duration: 1900ms !important;
+  }
+  .sales-packet-desc {
+    max-width: 350px;
+  }
+</style>
+<div class="card border-green">
+  <div class="card-header">
+    <h3 class="card-title">
+      Real Time Scan Vision <small id="card-scan-table-timestamp"></small>
+    </h3>
+  </div>
+  <div class="progress card-scan-table-progress">
+    <div class="progress-bar"
+         role="progressbar"
+         aria-voluemin="0"
+         aria-valuemax="100"></div>
+  </div>
+  <div class="table-responsive overflow-scroll mh-75">
+    <table class="table card-table table-sm table-hover" id="card-scan-table">
+      <thead>
+        <tr>
+          <th title="Train Number">Train No.</th>
+          <th title="Tour Number">Tour No.</th>
+          <th title="Conductor Number">Cond. No.</th>
+          <th title="Ticket Number">Ticket No.</th>
+          <th>Scanned On</th>
+          <th>Ticket Type</th>
+          <th title="Amount">Amount</th>
+          <th>Agency</th>
+          <th title="Ticket Form">Form</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td colspan="4" class="loader">Loading...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<script type="module">
+  let script_is_running = false;
+  let interval_id;
+  let pulling_data = false;
+  const load_data = () => {
+    if (pulling_data) {
+      return null
+    }
+    pulling_data = true;
+    const progress_bar = document.querySelector(".card-scan-table-progress");
+    progress_bar.classList.remove("active");
+    const tbody = document.querySelector("#card-scan-table tbody");
+
+    fetch("/api/ticket/scan/dashboard/card_scan_table/?live=true").then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    }).then(data => {
+      if (data.length) {
+        const loader = tbody.querySelector(".loader");
+        if (loader) loader.remove();
+        const timestamp = document.getElementById("card-scan-table-timestamp");
+        const now = new Date();
+        const now_ymd = now.toISOString().substring(0, 10);
+        timestamp.innerHTML = `(since: ${now.toLocaleTimeString()})`;
+        const details_url = '/ticket/scan/detail/?start_date={}&end_date={}';
+        progress_bar.classList.add("active");
+        data.reverse().forEach((item) => {
+          let tr = tbody.querySelector(`tr[id="${item.id}"]`)
+          const scanned_on = new Date(item.scanned_on);
+          const diff_ms = now - scanned_on;
+          const diff_s = diff_ms / 1000;
+          if (!tr) {
+            tr = document.createElement("tr");
+            tr.setAttribute("id", item.id);
+
+            tbody.insertBefore(tr, tbody.firstElementChild);
+          }
+          const _details_url = details_url.replaceAll("{}", scanned_on.toISOString().substring(0, 10))
+          tr.innerHTML = `
+            <td><a href="${_details_url}&train_id=${item.train_id}" target="_blank">${item.train_id}</a></td>
+            <td><a href="${_details_url}&tour_id=${item.tour_id}" target="_blank">${item.tour_id}</a></td>
+            <td><a href="${_details_url}&conductor_id=${item.conductor_id}" target="_blank">${item.conductor_id}</a></td>
+            <td>${item.ticket__number}</td>
+            <td>${mta.format.date_time.format(scanned_on)}</td>
+            <td><span class="d-inline-block text-truncate sales-packet-desc" title="${item.ticket__sales_packet__description}">${item.ticket__sales_packet__description}</span></td>
+            <td>${mta.format.usd.format(item.ticket__amount)}</td>
+            <td>${item.company__short_name}</td>
+            <td>${item.ticket__form}</td>
+            `;
+          if (diff_s <= 10) {
+            tr.classList.add("highlight")
+          }
+        })
+        /*if (data.length == 0){
+
+        } else {
+          let html = [];
+          data.forEach((item) => {
+            html.push(`<tr>
+              <td><a href="/ticket/scan/detail/?start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}&train_id=${item.train_id}" target="_blank">${item.train_id}</a></td>
+              <td>${item.total}</td>
+            </tr>`)
+          })
+          tbody.innerHTML = html.join("");
+        }*/
+      } else {
+        tbody.innerHTML = `<tr><td colspan="2" class="loader">No data available</td></tr>`
+      }
+      pulling_data = false;
+    })
+  }
+  load_data();
+
+  function start_script() {
+    if (!script_is_running) {
+      script_is_running = true;
+      interval_id = setInterval(load_data, 2000);
+    }
+  }
+
+  function stop_script() {
+    if (script_is_running) {
+      script_is_running = false;
+      clearInterval(interval_id);
+    }
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      stop_script();
+    } else {
+      start_script();
+    }
+  })
+  start_script();
+</script>

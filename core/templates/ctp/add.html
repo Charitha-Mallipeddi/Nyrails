@@ -1,0 +1,373 @@
+{% extends "layouts/base-page-fluid.html" %}
+{% block title %}
+Create Ctp
+{% endblock title %}
+{% block content %}
+<div class="bg-surface min-h-screen">
+  {% include "includes/ctp-header.html" with action="Create" %}
+  <main class="container py-5">
+    <form id="refund-form" method="post" action="{% url 'ctp:create' %}">
+      {% csrf_token %}
+      {% if form.non_field_errors or form.errors %}
+      <div class="message-alert alert-danger mb-4">
+        {% for e in form.non_field_errors %}<div class="text-sm font-bold">{{ e }}</div>{% endfor %}
+        {% for field, errs in form.errors.items %}
+        {% if field != '__all__' %}
+        {% for e in errs %}<div class="text-sm">{{ field }}: {{ e }}</div>{% endfor %}
+        {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% if payment_formset.non_field_errors or payment_formset.errors %}
+      <div class="message-alert alert-danger mb-4">
+        <div class="fs-5 border-bottom">Payment Errors</div>
+        {% for e in payment_formset.non_field_errors %}<div class="text-sm font-bold">{{ e }}</div>{% endfor %}
+        {% for form_errors in payment_formset.errors %}
+        {% for field, errs in form_errors.items %}
+        {% for e in errs %}<div class="text-sm">{{ field }}: {{ e }}</div>{% endfor %}
+        {% endfor %}
+        {% endfor %}
+      </div>
+      {% endif %}
+      <!-- Routing Information -->
+      <div class="section-card my-2">
+        <div class="d-flex align-items-start justify-content-between mb-4">
+          <div>
+            <h2 class="h2 fw-bold text-dark tracking-tight">Routing Information</h2>
+            <p class="small text-muted fw-medium mt-1">Status tracking and departmental assignment.</p>
+          </div>
+        </div>
+        <div class="row g-4">
+          {% if form.originally_entered_by.value != None %}
+          <div class="col-md-8">
+            {{ form.originally_entered_by.label }} :
+            {{ form.instance.originally_entered_by.username }}
+          </div>
+          {% endif %}
+          {% if form.date_entered.value != None %}
+          <div class="col-md-8">{{ form.date_entered.label }} : {{ form.date_entered.value }}</div>
+          {% endif %}
+          <div class="col-md-4">
+            <label class="form-label label-premium">Open Date</label>
+            {{ form.open_date }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label label-premium">Operational Status</label>
+            {{ form.routing_status }}
+          </div>
+        </div>
+        <div class="row g-4 mt-4 pt-4 border-top border-light">
+          <div class="col-md-6">
+            <label class="form-label label-premium">
+              From Department <span class="text-danger">*</span>
+            </label>
+            <div class="mb-3">{{ form.from_dept }}</div>
+            <div class="ms-4">
+              <label class="form-label label-premium">
+                From User <span class="text-danger">*</span>
+              </label>
+              {{ form.from_user }}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label label-premium">
+              To Department <span class="text-danger">*</span>
+            </label>
+            <div class="mb-3">{{ form.route_to_dept }}</div>
+            <div class="ms-4">
+              <label class="form-label label-premium">
+                To User <span class="text-danger">*</span>
+              </label>
+              {{ form.route_to_user }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Personal Information -->
+      <div class="section-card my-2">
+        <div class="d-flex align-items-start justify-content-between mb-4">
+          <div>
+            <h2 class="h2 fw-bold text-dark tracking-tight">Customer Information</h2>
+            <p class="small text-muted fw-medium mt-1">Verified personal and contact details.</p>
+          </div>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-2">
+            <label class="form-label label-premium">Title</label>
+            {{ form.title }}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label label-premium">
+              First Name <span class="text-danger">*</span>
+            </label>
+            {{ form.first_name }}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label label-premium">
+              Last Name <span class="text-danger">*</span>
+            </label>
+            {{ form.last_name }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label label-premium">
+              Identification Type <span class="text-danger">*</span>
+            </label>
+            {{ form.identification_type }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label label-premium">LIC #</label>
+            {{ form.lic_number }}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label label-premium">DOB</label>
+            {{ form.dob }}
+          </div>
+          <div class="col-md-2">
+            <label class="form-label label-premium">Invalid ID</label>
+            {{ form.invalid_id }}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label label-premium">Invalid Address</label>
+            {{ form.invalid_address }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label label-premium">Email Address</label>
+            {{ form.email }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label label-premium">Primary Phone</label>
+            <div class="d-flex gap-3">
+              <div class="w-25">{{ form.extension }}</div>
+              {{ form.day_phone }}
+            </div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label label-premium">Country</label>
+            <div class="d-flex gap-3">{{ form.country }}</div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label label-premium">State / Province</label>
+            {{ form.state }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label label-premium">City</label>
+            {{ form.city }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label label-premium">
+              Zip / Postal Code <span class="text-danger">*</span>
+            </label>
+            {{ form.zip_code }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label label-premium">
+              Address 1 <span class="text-danger">*</span>
+            </label>
+            {{ form.address_1 }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label label-premium">Address 2</label>
+            {{ form.address_2 }}
+          </div>
+        </div>
+      </div>
+      <!-- Commitment to pay information -->
+      <div class="section-card my-2">
+        <div class="d-flex align-items-start justify-content-between mb-4">
+          <div>
+            <h2 class="h2 fw-bold text-dark tracking-tight">Commitment to pay information</h2>
+            <p class="small text-muted fw-medium mt-1">Payment, Ticket Type and More</p>
+          </div>
+        </div>
+        {% if form.status_changed_by.value != None and form.status_changed_by.value != None %}
+        <div class="row g-4 mb-4">
+          <div class="col-6">{{ form.status_changed_by.label }} : {{ form.status_changed_by.value }}</div>
+          <div class="col-6">{{ form.status_date.label }} : {{ form.status_date.value }}</div>
+        </div>
+        {% endif %}
+        <div class="row g-4">
+          <div class="col-md-3">
+            <label class="form-label label-premium">Waived</label>
+            {{ form.waived }}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label label-premium">
+              Train # <span class="text-danger">*</span>
+            </label>
+            {{ form.train_num }}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label label-premium">
+              Ticket Type <span class="text-danger">*</span>
+            </label>
+            {{ form.ticket_type }}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label label-premium">
+              Invoice Date <span class="text-danger">*</span>
+            </label>
+            {{ form.invoice_date }}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label label-premium">
+              Bill # <span class="text-danger">*</span>
+            </label>
+            {{ form.bill_num }}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label label-premium">
+              Line <span class="text-danger">*</span>
+            </label>
+            {{ form.line }}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label label-premium">
+              From Station <span class="text-danger">*</span>
+            </label>
+            {{ form.from_station }}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label label-premium">
+              To Station <span class="text-danger">*</span>
+            </label>
+            {{ form.to_station }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label label-premium">Amount Due</label>
+            {{ form.amount_due }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label label-premium">Amount Paid</label>
+            {{ form.amount_paid }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label label-premium">Balance</label>
+            {{ form.balance }}
+          </div>
+        </div>
+      </div>
+      <!-- CTP Letters  -->
+      <div class="section-card my-2">
+        <div class="d-flex align-items-start justify-content-between mb-4">
+          <div>
+            <h2 class="h2 fw-bold text-dark tracking-tight">CTP Letters</h2>
+            <p class="small text-muted fw-medium mt-1">Letters info</p>
+          </div>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-4">
+            <label class="form-label label-premium">Letter Print Batch #</label>
+            {{ form.letter_print_batch }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label label-premium">Letter Sent Date</label>
+            {{ form.letter_sent_date }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label label-premium">Letter Generated Date</label>
+            {{ form.letter_generated_date }}
+          </div>
+        </div>
+      </div>
+      <!-- Payment Information  -->
+      <div class="section-card my-2 w-100">
+        <div class="d-flex align-items-start justify-content-between mb-4">
+          <div>
+            <h2 class="h2 fw-bold text-dark tracking-tight">CTP Payments</h2>
+            <p class="small text-muted fw-medium mt-1">Transactions and Payments</p>
+          </div>
+        </div>
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <div class="d-flex justify-content-between gap-2 w-100">
+            <div class="label-premium">
+              Transactions
+            </div>
+            <button type="button" id="manual-payment-btn" class="btn btn-default text-sm px-4 py-2">Add Manual
+              Payment</button>
+          </div>
+        </div>
+
+        <div id="manual-payment-form" class="d-none row g-4">
+          <div class="col-md-3">
+            <label class="form-label label-premium">Payment Type <span class="text-danger">*</span></label>
+            {{ form.payment_type }}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label label-premium">Check #</label>
+            {{ form.check_number }}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label label-premium">Date of Payment</label>
+            {{ form.date_of_payment }}
+          </div>
+          <div class="col-md-3">
+            <label class="form-label label-premium">Amount Paid</label>
+            {{ form.amount_paid }}
+          </div>
+          <div class="col-md-3 d-none">
+            <label class="form-label label-premium">Manual Payment</label>
+            {{ form.is_manual_payment.as_hidden }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Conductor Input Information  -->
+      <div class="section-card my-2">
+        <div class="d-flex align-items-start justify-content-between mb-4">
+          <div>
+            <h2 class="h2 fw-bold text-dark tracking-tight">Conductor Input</h2>
+            <p class="small text-muted fw-medium mt-1">Conductor comments</p>
+          </div>
+        </div>
+        <div class="row g-4 mt-3">
+          <div class="col-md-4">
+            <label class="form-label label-premium">Reason for Non-Payment <span class="text-danger">*</span></label>
+            {{ form.reason_for_non_payment }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label label-premium">
+              Conductor Emp # <span class="text-danger">*</span>
+            </label>
+            {{ form.conductor_emp_num }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label label-premium">Conductor Name</label>
+            {{ form.conductor_name }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label label-premium">TIM #</label>
+            {{ form.tim_num }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label label-premium">Shift ID</label>
+            {{ form.shift_id }}
+          </div>
+          <div class="col-md-12">
+            <label class="form-label label-premium">Remarks</label>
+            {{ form.remarks }}
+          </div>
+        </div>
+      </div>
+      <!-- Clerk Inputs -->
+      <div class="section-card my-2">
+        <div class="d-flex align-items-start justify-content-between mb-4">
+          <div>
+            <h2 class="h2 fw-bold text-dark tracking-tight">Clerk Input</h2>
+            <p class="small text-muted fw-medium mt-1">Clerk purposes only</p>
+          </div>
+        </div>
+        <div class="row g-4 mt-3">
+          <div class="col-md-12">
+            <label class="form-label label-premium">Comments</label>
+            {{ form.clerk_remarks }}
+          </div>
+        </div>
+      </div>
+    </form>
+  </main>
+</div>
+{% endblock content %}
+{% block scripts %}
+{% load static %}
+<script src="{% static 'js/add-ctp.js' %}"></script>
+{% endblock scripts %}

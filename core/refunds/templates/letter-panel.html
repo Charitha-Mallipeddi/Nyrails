@@ -1,0 +1,83 @@
+<!-- Overlay -->
+<div id="overlay" class="d-none position-fixed top-0 start-0 w-100 h-100 bg-dark opacity-50 slideout-overlay"></div>
+<!-- Slideout Panel -->
+<div id="panel" data-slideout-panel="letter-panel" data-refund-id="{{ refund.id }}"
+  class="position-fixed top-0 end-0 h-100 shadow-lg slideout-panel translate-x-full">
+  <!-- Close Button -->
+  <button type="button" class="position-absolute top-0 end-0 m-3 text-secondary btn-close" data-slideout-close
+    aria-label="Close"></button>
+  <!-- Panel Content -->
+  <div class="p-4 pt-5">
+    <h2 class="h2 fw-bold text-dark mb-4">Denial Letter</h2>
+    <!-- Letter Body -->
+
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <p class="mb-2 text-muted small">
+          {{ refund.date_entered }} • Reference # {{ refund.sequence_number }}
+        </p>
+
+        <div class="mb-3">
+          <div>{{ refund.first_name }} {{ refund.last_name }}</div>
+          <div>{{ refund.address_1 }}</div>
+          <div>{{ refund.city }}, {{ refund.state }} {{ refund.zip_code }}</div>
+          <div>Email: {{ refund.email }}</div>
+        </div>
+
+        <p class="mb-3">Dear {{ refund.first_name }} {{ refund.last_name }},</p>
+
+        <p class="mb-2">
+          Upon receipt and review of your application, it was determined that your
+          application for a refund has been Denied for the following reason(s):
+        </p>
+
+        <p class="mb-3 fw-semibold">{{ refund.denial_justification|linebreaksbr }}</p>
+
+        <p class="mb-2">
+          The {{ refund.company.short_name }} is a state agency that must comply with regulated tariffs that govern the
+          pricing of tickets and the issuance of refunds. The decision was rendered
+          based on these regulations in order for the {{ refund.company.short_name }} to remain in compliance.
+          Additional
+          information regarding the {{ refund.company.short_name }}'s fare structure and refund policy may be obtained
+          via our website
+          <a href="https://mta.info/fares-tolls/lirr-metro-north" target="_blank" rel="noopener" class="link-primary">
+            https://mta.info/fares-tolls/lirr-metro-north
+          </a>.
+        </p>
+
+        <p class="mb-2">Although we are unable to fulfill your request, we appreciate your patronage.</p>
+
+        <p class="mb-2">
+          This email notification is generated automatically and cannot accept responses. If
+          you need additional assistance, please contact us via the MTA's online reporting
+          system
+          <a href="https://contact.mta.info/s/customer-feedback" target="_blank" rel="noopener" class="link-primary">
+            https://contact.mta.info/s/customer-feedback
+          </a>
+          or call (718) 217-5477. Please include the reference number you received in this letter in your
+          correspondence or have it available to provide to an agent if contacting us by phone.
+        </p>
+
+        <p class="mb-3">
+          Respectfully,<br>
+          {{ refund.company.short_name }} Refund Department
+        </p>
+
+        <p class="mb-0 text-muted">
+          MTA {{ refund.company.name }} is an agency of the Metropolitan Transportation
+          Authority, State of New York, Janno Lieber, Chairman &amp; CEO
+        </p>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-3">
+      <a class="btn btn-primary" href="{% url 'refunds:denial_letter_pdf' pk=form.instance.pk %}">
+        <i class="bi bi-download me-1"></i> Download
+      </a>
+      <button type="button" class="btn btn-outline-secondary" onclick="window.print()">
+        <i class="bi bi-printer me-1"></i> Print
+      </button>
+    </div>
+
+  </div>
+</div>

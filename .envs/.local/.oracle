@@ -1,0 +1,6 @@
+# Oracle Database settings
+ORACLE_HOST=oracle-db
+ORACLE_PORT=1521
+ORACLE_SERVICE=FREEPDB1
+ORACLE_USER=developer
+ORACLE_PASSWORD=pyrnyq-voRjib-6sogde

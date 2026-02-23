@@ -1,0 +1,27 @@
+{% extends "layouts/base-page.html" %}
+{% block title %}FAQ | Choose a FAQ Question{% endblock title %}
+{% block page_pretitle %}{% endblock page_pretitle %}
+{% block page_title_actions %}
+  <a href="{% url 'faq:index_view' %}" class="btn btn-default"><i class="fa-solid fa-chevron-left"></i> back</a>
+  {% if can_add_question %}
+    <a href="{% url 'faq:add_question' category.slug %}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> add question</a>
+  {% endif %}
+{% endblock page_title_actions %}
+{% block page_title %}
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'faq:index_view' %}">FAQ</a></li>
+        <li class="breadcrumb-item active">{{ category }}</li>
+      </ol>
+    </nav>
+{% endblock page_title %}
+{% block page_body %}
+  {% if category.description %}<p>{{ category.description }}</p>{% endif %}
+
+  {% for question in category.question_set.all %}
+    <h3>
+      <a href="{% url 'faq:question_detail' category.slug question.slug %}">{{ question.question }}</a>
+    </h3>
+  {% endfor %}
+  <hr />
+{% endblock page_body %}

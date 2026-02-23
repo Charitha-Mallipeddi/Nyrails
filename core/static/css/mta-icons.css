@@ -1,0 +1,30 @@
+@font-face {
+  font-family: "mta-icons";
+  src: url('../webfonts/mta-icons.eot?t=1764944732365'); /* IE9*/
+  src: url('../webfonts/mta-icons.eot?t=1764944732365#iefix') format('embedded-opentype') /* IE6-IE8 */,
+  url('../webfonts/mta-icons.woff2?t=1764944732365') format('woff2'),
+  url('../webfonts/mta-icons.woff?t=1764944732365') format('woff'),
+  url('../webfonts/mta-icons.ttf?t=1764944732365') format('truetype'),
+  url('../webfonts/mta-icons.svg?t=1764944732365') format('svg');
+}
+
+[class^="mta-i-"], [class*=" mta-i-"] {
+  font-family: 'mta-icons' !important;font-size: undefined;
+  font-style:normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+.mta-i-credit-card-check::before { content: "\ea01"; }
+.mta-i-etix-ticket::before { content: "\ea02"; }
+.mta-i-etix::before { content: "\ea03"; }
+.mta-i-farego-alt::before { content: "\ea04"; }
+.mta-i-farego::before { content: "\ea05"; }
+.mta-i-obtims-ticket::before { content: "\ea06"; }
+.mta-i-paper-ticket::before { content: "\ea07"; }
+.mta-i-refunds::before { content: "\ea08"; }
+.mta-i-ticket-services-alt::before { content: "\ea09"; }
+.mta-i-ticket-services::before { content: "\ea0a"; }
+
+

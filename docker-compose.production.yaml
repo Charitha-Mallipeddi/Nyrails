@@ -1,0 +1,18 @@
+volumes:
+  production_django_media: {}
+  core_django_data: {}
+services:
+  django:
+    container_name: django_core_prod
+    build:
+      context: .
+      dockerfile: ./compose/production/django/Dockerfile
+    image: rfc/core
+    volumes:
+      - production_django_media:/srv/core/media
+      - core_django_data:/srv/data
+    env_file:
+      - .envs/.production/.django
+    ports:
+      - '0.0.0.0:8080:8000'
+    command: /start

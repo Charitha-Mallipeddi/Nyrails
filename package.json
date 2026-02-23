@@ -1,0 +1,25 @@
+{
+  "name": "core",
+  "version": "1.0.0",
+  "main": "vite/vite.config.js",
+  "scripts": {
+    "dev": "vite -c vite/vite.config.js --host",
+    "build": "vite build -c vite/vite.config.js",
+    "font": "svgtofont --sources ./core/static/icons --output ./core/static/webfonts"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.1.0",
+    "@tabler/core": "^1.4.0",
+    "apexcharts": "^5.3.5",
+    "autosize": "^6.0.1",
+    "datatables.net-bs5": "^2.3.4",
+    "flatpickr": "^4.6.13",
+    "glob": "^13.0.0"
+  },
+  "devDependencies": {
+    "sass": "^1.93.2",
+    "svgtofont": "^6.4.1",
+    "vite": "^7.1.9"
+  },
+  "svgtofont": {}
+}

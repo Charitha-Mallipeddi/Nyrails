@@ -1,0 +1,101 @@
+{% extends "layouts/base-page-fluid.html" %}
+
+{% block title %}
+  Ticket Scan Dashboard
+{% endblock title %}
+{% block page_pretitle %}
+  Monitoring - Ticket(s)
+{% endblock page_pretitle %}
+{% block page_title %}
+  <i class="fa-solid fa-qrcode"></i> Scan Dashboard
+{% endblock page_title %}
+{% block extrastyle %}
+  <style>
+    #datepicker-icon-prepend {
+      width: 220px;
+    }
+  </style>
+{% endblock extrastyle %}
+{% block page_title_actions %}
+<a href="{% url 'ticket:scan_detail' %}" class="btn btn-default">Scan Details</a>
+{% endblock page_title_actions %}
+{% block page_body %}
+  <div class="row">
+    <div class="col-12 border ms-2 my-3 p-2 text-center bg-green text-lime-fg rounded">
+      <h3 class="m-0 p-0"><i class="fa-solid fa-tower-broadcast"></i> Live Data <small class="text-lime-fg">({{ start_date_time }} <i class="fa-solid fa-arrow-right"></i> {{ end_date_time }})</small></h3>
+    </div>
+  </div>
+  <div class="row row-deck row-cards">
+    <div class="col-sm-12 col-lg-5 col-xl-12">{% include "ticket/scan/card_scan_table.html" %}</div>
+    <div class="col-sm-12 col-lg-7 col-xl-6 col-xxl-6">
+      {% include "ticket/scan/card_type_pie.html" with agency_id=1 live=True %}
+    </div>
+    <div class="col-sm-12 col-lg-7 col-xl-6 col-xxl-6">
+      {% include "ticket/scan/card_type_pie.html" with agency_id=2 live=True %}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 border ms-2 my-3 text-center bg-gray-400 text-gray-400-fg rounded">
+      <form name="global-filters" id="global-filters" method="get">
+        <input type="hidden" name="start_date" value="{{ start_date|date:'Y-m-d' }}" />
+        <input type="hidden" name="end_date" value="{{ end_date|date:'Y-m-d' }}" />
+        <div class="row justify-content-between">
+          <div class="offset-sm-1 col-sm-7 col-xl-9">
+            <h3 class="m-2 p-0"><i class="fa-solid fa-clock-rotate-left"></i> History Data <small class="text-gray-300-fg">({{ start_date }} <i class="fa-solid fa-arrow-right"></i> {{ end_date }})</small></h3>
+          </div>
+          <div class="col-auto pe-0">
+            <div class="input-group">
+              <div class="input-icon">
+                <span class="input-icon-addon"><i class="fa-solid fa-calendar"></i></span>
+                <input class="form-control"
+                      placeholder="Select a date"
+                      id="datepicker-icon-prepend" />
+              </div>
+              <button type="submit" class="btn btn-primary">Apply</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="row row-deck row-cards">
+    <div class="col-sm-12 col-lg-3 col-xl-6">{% include "ticket/scan/card_agency_line.html" %}</div>
+    <div class="col-sm-6 col-lg-3 col-xl-6">{% include "ticket/scan/card_agency_heatmap.html" %}</div>
+    <div class="col-sm-12 col-lg-7 col-xl-6 col-xxl-6">
+      {% include "ticket/scan/card_type_pie.html" with agency_id=1 live=False %}
+    </div>
+    <div class="col-sm-12 col-lg-7 col-xl-6 col-xxl-6">
+      {% include "ticket/scan/card_type_pie.html" with agency_id=2 live=False %}
+    </div>
+    <div class="col-sm-6 col-lg-3 col-xl-3">{% include "ticket/scan/card_conductor_table.html" with agency_id=1 %}</div>
+    <div class="col-sm-6 col-lg-3 col-xl-3">{% include "ticket/scan/card_conductor_table.html" with agency_id=2 %}</div>
+    <div class="col-sm-6 col-lg-3 col-xl-3">{% include "ticket/scan/card_train_table.html" with agency_id=1 %}</div>
+    <div class="col-sm-6 col-lg-3 col-xl-3">{% include "ticket/scan/card_train_table.html" with agency_id=2 %}</div>
+    <div class="col-sm-6 col-lg-3 col-xl-6">{% include "ticket/scan/card_time_response_line.html" with agency_id=1 %}</div>
+    <div class="col-sm-6 col-lg-3 col-xl-6">{% include "ticket/scan/card_time_response_line.html" with agency_id=2 %}</div>
+    <div class="col-sm-6 col-lg-3 col-xl-6">{% include "ticket/scan/card_time_response_pie.html" with agency_id=1 %}</div>
+    <div class="col-sm-6 col-lg-3 col-xl-6">{% include "ticket/scan/card_time_response_pie.html" with agency_id=2 %}</div>
+  </div>
+{% endblock page_body %}
+{% block extrajs %}
+  <script type="module">
+    const date_range = flatpickr("#datepicker-icon-prepend", {
+      mode: "range",
+      maxDate: "today",
+      dateFormat: 'Y-m-d',
+      defaultDate: ["{{ start_date|date:'Y-m-d' }}", "{{ end_date|date:'Y-m-d' }}"],
+      onChange: (selectedDates, dateStr, instance) => {
+        const filter_form = document.querySelector("#global-filters");
+        const start_date_el = filter_form.querySelector("input[name=start_date]");
+        const end_date_el = filter_form.querySelector("input[name=end_date]");
+        if (selectedDates.length > 1) {
+          start_date_el.value = selectedDates[0].toISOString().substring(0, 10);
+          end_date_el.value = selectedDates[1].toISOString().substring(0, 10);
+        }
+        console.log(selectedDates);
+        console.log(start_date_el, end_date_el);
+
+      }
+    })
+  </script>
+{% endblock extrajs %}

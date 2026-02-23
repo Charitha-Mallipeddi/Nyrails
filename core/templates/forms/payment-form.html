@@ -1,0 +1,134 @@
+<div
+  class="relative grid grid-cols-1 md:grid-cols-12 gap-3 items-start rounded p-4 bg-white/50 border border-slate-100 shadow-sm"
+  data-form-index="{{ forloop.counter0 }}"
+>
+  {% if form.non_field_errors %}
+  <div class="message-alert alert-danger mb-2">
+    {% for e in form.non_field_errors %}
+    <div class="text-sm">{{ e }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% if form.DELETE %}
+  <div class="absolute right-3 top-3">
+    <button
+      type="button"
+      class="remove-ticket hover:cursor-pointer text-xs px-3 py-1 rounded bg-red-50 border border-red-100 text-red-600"
+    >
+      Remove
+    </button>
+  </div>
+  {% endif %}
+
+  <div
+    class="md:col-span-12 grid grid-cols-1 md:grid-cols-12 gap-4 border-b pb-2 my-2"
+  >
+    <div class="md:col-span-2">
+      <label class="text-xs font-bold text-slate-400 uppercase tracking-widest"
+        >{{form.article_no.label}}</label
+      >
+      {{ form.article_no }}
+      {% for e in form.article_no.errors %}
+      <div class="text-sm text-red-700 mt-1">{{ e }}</div>
+      {% endfor %}
+    </div>
+    <div class="md:col-span-2">
+      <label class="text-xs font-bold text-slate-400 uppercase tracking-widest"
+        >{{form.quantity.label}} <span class="text-red-600">*</span></label
+      >
+      {{ form.quantity }}
+      {% for e in form.quantity.errors %}
+      <div class="text-sm text-red-700 mt-1">{{ e }}</div>
+      {% endfor %}
+    </div>
+    <div class="md:col-span-3">
+      <label class="text-xs font-bold text-slate-400 uppercase tracking-widest"
+        >{{form.ticket_type.label}}<span class="text-red-600">*</span></label
+      >
+      {{form.ticket_type}}
+      {% for e in form.ticket_type.errors %}
+      <div class="text-sm text-red-700 mt-1">{{ e }}</div>
+      {% endfor %}
+    </div>
+    <div class="md:col-span-2">
+      <label class="text-xs font-bold text-slate-400 uppercase tracking-widest"
+        >{{ form.fare.label }} <span class="text-red-600">*</span></label
+      >
+      {{ form.fare }}
+      {% for e in form.fare.errors %}
+      <div class="text-sm text-red-700 mt-1">{{ e }}</div>
+      {% endfor %}
+    </div>
+    <div class="md:col-span-3">
+      <label class="text-xs font-bold text-slate-400 uppercase tracking-widest">
+        {{ form.refund_amount.label }}<span class="text-red-600">*</span>
+      </label>
+      {{ form.refund_amount }}
+      {% for e in form.refund_amount.errors %}
+      <div class="text-sm text-red-700 mt-1">{{ e }}</div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="md:col-span-4">
+    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest"
+      >{{form.line.label}} <span class="text-red-600">*</span></label
+    >
+    {{form.line}}
+    {% for e in form.line.errors %}
+    <div class="text-sm text-red-700 mt-1">{{ e }}</div>
+    {% endfor %}
+  </div>
+
+  <div class="md:col-span-4">
+    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest"
+      >{{form.from_station.label}}</label
+    >
+    {{form.from_station}}
+    {% for e in form.from_station.errors %}
+    <div class="text-sm text-red-700 mt-1">{{ e }}</div>
+    {% endfor %}
+  </div>
+
+  <div class="md:col-span-4">
+    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest"
+      >{{form.to_station.label}}</label
+    >
+    {{form.to_station}}
+    {% for e in form.to_station.errors %}
+    <div class="text-sm text-red-700 mt-1">{{ e }}</div>
+    {% endfor %}
+  </div>
+
+  <div class="md:col-span-4">
+    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest"
+      >{{form.pay_type_1.label}} <span class="text-red-600">*</span></label
+    >
+    {{form.pay_type_1}}
+    {% for e in form.pay_type_1.errors %}
+    <div class="text-sm text-red-700 mt-1">{{ e }}</div>
+    {% endfor %}
+  </div>
+
+  <div class="md:col-span-4">
+    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest"
+      >{{form.pay_type_2.label}}</label
+    >
+    {{form.pay_type_2}}
+    {% for e in form.pay_type_2.errors %}
+    <div class="text-sm text-red-700 mt-1">{{ e }}</div>
+    {% endfor %}
+  </div>
+
+  <div class="md:col-span-4">
+    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest"
+      >Ticket Number</label
+    >
+    {{ form.ticket_number }}
+    {% for e in form.ticket_number.errors %}
+    <div class="text-sm text-red-700 mt-1">{{ e }}</div>
+    {% endfor %}
+  </div>
+
+  {{ form.id }}
+</div>

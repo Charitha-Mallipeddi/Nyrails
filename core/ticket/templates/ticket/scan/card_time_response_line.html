@@ -1,0 +1,139 @@
+<style>
+  .apexcharts-text.apexcharts-yaxis-annotation-label  {
+    color: white;
+    fill: white !important;
+  }
+</style>
+<div class="card" id="card-time-response-{{ agency_id }}">
+  <div class="card-body pb-0">
+    <div class="subheader">Scan Response Time - {% if agency_id == 1 %}
+        MNR
+      {% else %}
+        LIRR
+      {% endif %}<br/></div>
+  </div>
+  <div class="position-relative apex-chart-wrapper mx-3"></div>
+</div>
+<script type="module">
+
+  document.addEventListener("DOMContentLoaded", function() {
+    if (window.ApexCharts) {
+      const card = document.getElementById("card-time-response-{{ agency_id }}");
+      const chart_el = card.querySelector(".apex-chart-wrapper");
+      const data_diff_el = card.querySelector(".data-diff");
+      const data_this_month_el = card.querySelector(".data-this-month");
+      const data_diff_percent_el = card.querySelector(".data-diff-percent");
+
+      const chart = new ApexCharts(chart_el, {
+        chart: {
+          type: 'area',
+          stacked: false,
+          height: 250,
+          zoom: {
+            type: 'x',
+            enabled: true,
+            autoScaleYaxis: true
+          },
+          toolbar: {
+            autoSelected: 'zoom'
+          }
+        },
+        annotations: {
+          yaxis: [
+            {
+              y: 500,
+              borderColor: '#ff0000ff',
+              label: {
+                borderColor: '#ff0000ff',
+                style:{
+                  color: '#ffffffff',
+                  background: '#ff0000ff'
+                },
+                text: "500 millisecond limit"
+              }
+            }
+          ]
+        },
+        stroke: {
+          width: 1
+        },
+        series: [],
+        dataLabels: {
+          enabled: false
+        },
+        markers: {
+          size: 0,
+        },
+        fill: {
+          type: 'gradient',
+          gradient: {
+            shadeIntensity: 1,
+            inverseColors: false,
+            opacityFrom: 0.5,
+            opacityTo: 0,
+            stops: [0, 90, 100]
+          },
+        },
+        yaxis: {
+          labels: {
+            formatter: function (val) {
+              return val;
+            },
+          },
+          title: {
+            text: 'milliseconds'
+          },
+        },
+        xaxis: {
+          type: 'datetime',
+        },
+        tooltip: {
+          shared: false,
+          /*y: {
+            formatter: function (val) {
+              return `${mta.format.time_duration(val)} - Count: `
+            }
+          },*/
+          custom: function({series, seriesIndex, dataPointIndex, w}) {
+            const color = w.globals.colors[seriesIndex];
+            const series_data = w.config.series[seriesIndex]
+            const series_name = series_data.name;
+            const data_item = series_data.data[dataPointIndex];
+            const val_data = new Date(data_item.x);
+            const val_label = val_data.toLocaleDateString(undefined,{month:'short', day: 'numeric'})
+            const counter = series_data.data[dataPointIndex].count;
+
+            const data = series[seriesIndex];
+            const val = data[dataPointIndex];
+            return `
+            <div class="apexcharts-tooltip-title" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;">${val_label}</div>
+            <div class="apexcharts-tooltip-series-group apexcharts-tooltip-series-group-${seriesIndex} apexcharts-active" style="order: 1; display: flex;">
+              <span class="apexcharts-tooltip-marker" shape="circle" style="color: ${color};"></span>
+              <div class="apexcharts-tooltip-text" style="font-family: Helvetica, Arial, sans-serif; font-size: 12px;">
+                <div class="apexcharts-tooltip-y-group">
+                  <span class="apexcharts-tooltip-text-y-label">${series_name}: </span>
+                  <span class="apexcharts-tooltip-text-y-value">${mta.format.time_duration(val)}</span>
+                </div>
+                <div class="apexcharts-tooltip-goals-group">
+                  <span class="apexcharts-tooltip-text-goals-label">Scan Count: </span>
+                  <span class="apexcharts-tooltip-text-goals-value">${counter}</span>
+                </div>
+              </div>
+            </div>
+            `
+          }
+        }
+      });
+      fetch("/api/ticket/scan/dashboard/card_time_response_line/?start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}&agency_id={{ agency_id }}").then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      }).then(data => {
+        chart.updateOptions(data.chart);
+      })
+      chart.render();
+
+    }
+  });
+</script>

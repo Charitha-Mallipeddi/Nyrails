@@ -1,0 +1,35 @@
+{% load crispy_forms_filters %}
+{{filter_form.media}}
+
+<!-- Filter Slideout Panel -->
+<div class="slideout-overlay d-none"></div>
+<div data-slideout-panel="filter-panel" class="position-fixed top-0 end-0 translate-x-full bg-white border-start"
+    style="width: 500px; height: 100vh; overflow-y: auto; z-index: 1050; transition: transform 0.3s ease;">
+    <div class="p-4 border-bottom d-flex justify-content-between align-items-center sticky-top bg-white">
+        <h2 class="mb-0">Advanced Filters</h2>
+        <button type="button" class="btn btn-close" data-slideout-close></button>
+    </div>
+
+    <form id="filter-form" method="get" action="{% url 'refunds:list' %}" class="p-4">
+        {{ filter_form.sequence_number|as_crispy_field }}
+
+        {{ filter_form.company|as_crispy_field }}
+        {{ filter_form.department|as_crispy_field }}
+
+        {{ filter_form.from_user|as_crispy_field }}
+        {{ filter_form.to_user|as_crispy_field }}
+
+        {{ filter_form.date_entered_from|as_crispy_field }}
+        {{ filter_form.date_entered_to|as_crispy_field }}
+
+        <div class="d-flex justify-content-between gap-2 mb-3">
+            {{ filter_form.amount_from|as_crispy_field }}
+            {{ filter_form.amount_to|as_crispy_field }}
+        </div>
+
+        <div class="d-flex gap-2 sticky-bottom bg-white pt-3 border-top mt-4">
+            <a type="reset" class="btn btn-outline-secondary flex-grow-1" href="{% url 'refunds:list' %}">Clear</a>
+            <button type="submit" class="btn btn-primary flex-grow-1">Apply Filters</button>
+        </div>
+    </form>
+</div>

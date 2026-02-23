@@ -1,0 +1,13 @@
+# Django settings
+DJANGO_SETTINGS_MODULE=config.settings.local
+DJANGO_SECRET_KEY=django-insecure-local-dev-key-change-in-production
+DJANGO_DEBUG=True
+DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0
+
+# Email settings (using mailpit)
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=mailpit
+EMAIL_PORT=1025
+
+# Database
+USE_DOCKER=yes

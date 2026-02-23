@@ -1,0 +1,13 @@
+{% extends "layouts/base-page-fluid.html" %}
+
+{% block page_pretitle %}
+  MTA Core
+{% endblock page_pretitle %}
+{% block page_title %}
+  Home
+{% endblock page_title %}
+{% block page_body %}
+  {% if perms.ticket.view_ticketscan %}
+    <a href="{% url 'ticket:scan_dashboard' %}" class="btn btn-lg fs-1"><i class="fa-solid fa-qrcode me-2"></i> Ticket Scan</a>
+  {% endif %}
+{% endblock page_body %}

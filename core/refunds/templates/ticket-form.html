@@ -1,0 +1,18 @@
+{% load crispy_forms_filters %}
+
+<div class="position-relative row g-3 align-items-start p-4"
+     data-form-index="{{ forloop.counter0 }}">
+  {% if form.DELETE %}
+    <div class="position-absolute top-0 end-0 m-3 d-flex justify-content-end">
+      <button type="button" class="remove-ticket btn btn-sm btn-outline-danger">Remove</button>
+    </div>
+  {% endif %}
+  <div class="col-md-3">{{ form.article_no|as_crispy_field }}</div>
+  <div class="col-md-3">{{ form.quantity|as_crispy_field }}</div>
+  <div class="col-md-3">{{ form.fare|as_crispy_field }}</div>
+  <div class="col-md-3">{{ form.refund_amount|as_crispy_field }}</div>
+  <div class="col-md-3">{{ form.from_station|as_crispy_field }}</div>
+  <div class="col-md-3">{{ form.to_station|as_crispy_field }}</div>
+  <div class="col-md-3">{{ form.pay_type_1|as_crispy_field }}</div>
+  {{ form.id }}
+</div>

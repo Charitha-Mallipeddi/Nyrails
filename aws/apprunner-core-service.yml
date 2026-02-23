@@ -1,0 +1,16 @@
+ServiceName: dev-core-service
+SourceConfiguration:
+  ImageRepository:
+    ImageIdentifier: 205251327187.dkr.ecr.us-east-2.amazonaws.com/mta/core:latest
+    ImageRepositoryType: ECR
+    ImageConfiguration:
+      Port: '5000'
+  AuthenticationConfiguration:
+    AccessRoleArn: arn:aws:iam::205251327187:role/dev-core-apprunner-role
+HealthCheckConfiguration:
+  Protocol: 'HTTP'
+  Path: '/accounts/login/'
+
+InstanceConfiguration:
+  Cpu: '256'
+  Memory: '512'

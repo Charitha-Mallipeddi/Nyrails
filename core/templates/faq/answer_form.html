@@ -1,0 +1,57 @@
+{% extends "layouts/base-page.html" %}
+
+{% block title %}FAQ | Answer Question{% endblock title %}
+{% block page_title %}Answer Question{% endblock page_title %}
+{% block page_pretitle %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'faq:index_view' %}">FAQ</a>
+      </li>
+      {% if question.category and category_enabled %}
+        <li class="breadcrumb-item">
+          <a href="{% url 'faq:category_detail' question.category.slug %}">{{ question.category }}</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a href="{% url 'faq:question_detail' question.category.slug question.slug %}">{{ question.question }}</a>
+        </li>
+      {% else %}
+        <li class="breadcrumb-item">
+          <a href="{% url 'faq:question_detail' question.slug %}">{{ question.question }}</a>
+        </li>
+      {% endif %}
+      <li class="breadcrumb-item active">Answer Question</li>
+    </ol>
+  </nav>
+{% endblock page_pretitle %}
+{% block page_body %}
+  <a href="{{ question.get_absolute_url }}">
+    <h2>{{ question.question }}</h2>
+  </a>
+  <form method="post">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="mb-3">
+        <label for="{{ field.auto_id }}" class="form-label">{{ field.label }}</label>
+        <textarea name="{{ field.name }}"
+               class="form-control"
+               id="{{ field.auto_id }}"
+               data-bs-toggle="autosize"
+               placeholder="Type your answer..."
+               rows="5"
+               required></textarea>
+        {% if field.errors %}
+          {% for error in field.errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
+        {% endif %}
+        <span class="">Markdoown supported <a href="https://www.markdownguide.org/cheat-sheet/" class="btn btn-link">Cheat Sheet</a></span>
+      </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-success"><i class="fa-solid fa-floppy-disk"></i> Submit</button>
+    <script>
+      document.addEventListener("DOMContentLoaded", (e) => {
+        const el = document.querySelectorAll('[data-bs-toggle=autosize]');
+        autosize(el);
+      })
+    </script>
+  </form>
+{% endblock page_body %}

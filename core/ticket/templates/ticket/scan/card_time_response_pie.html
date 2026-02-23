@@ -1,0 +1,141 @@
+<style>
+  #card-time-reponse-pie-{{ agency_id }}{% if live %}-live{% endif %} .apexcharts-text {
+    fill: white !important;
+  }
+</style>
+<div class="card{% if live %} border-green{% endif %}" id="card-time-reponse-pie-{{ agency_id }}{% if live %}-live{% endif %}">
+  <div class="card-body pb-0">
+    <div class="subheader">
+      Scan Processing -
+      {% if agency_id == 1 %}
+        MNR
+      {% else %}
+        LIRR
+      {% endif %}<br/>
+      <span class="response-time-range strong small"></span>
+    </div>
+  </div>
+  <div class="position-relative apex-chart-wrapper"></div>
+</div>
+<script type="module">
+  document.addEventListener("DOMContentLoaded", function() {
+    if (window.ApexCharts) {
+      const card = document.getElementById("card-time-reponse-pie-{{ agency_id }}{% if live %}-live{% endif %}");
+      const chart_el = card.querySelector(".apex-chart-wrapper");
+      const time_range_el = card.querySelector(".response-time-range");
+
+
+      const chart = new ApexCharts(chart_el, {
+        chart: {
+          type: "pie",
+          height: 500,
+          foreColor: "#ffffff"
+        },
+        tooltip: {
+          theme: "dark",
+          fillSeriesColor: false
+        },
+        series: [],
+        noData: {
+          text: "Loading..."
+        },
+        legend: {
+          show: false,
+        },
+        dataLabels: {
+          enabled: true,
+          formatter: function(val, opts) {
+            const data = opts.w.config.labels[opts.seriesIndex];
+
+            return [data + 'ms', Math.round(val) + '%']
+          }
+        },
+        tooltip: {
+          custom: ({
+            series,
+            seriesIndex,
+            dataPointIndex,
+            w
+          }) => {
+            const value = series[seriesIndex];
+            const _label = w.config.labels[seriesIndex];
+            return `<div class="arrow_box">
+            ${mta.format.time_duration(_label)}: <span>${value}</span>
+            </div>`
+          }
+        },
+        responsive: [{
+          breakpoint: 1200,
+          options: {
+            chart: {
+              width: 580
+            },
+            legend: {
+              position: 'right'
+            }
+
+          }
+        }, {
+          breakpoint: 992,
+          options: {
+            chart: {
+              width: 800
+            },
+            legend: {
+              position: 'right'
+            }
+          }
+        }, {
+          breakpoint: 576,
+          options: {
+            chart: {
+              width: 530
+            },
+            legend: {
+              position: 'right'
+            }
+          }
+        }, {
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 400
+            },
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }, {
+          breakpoint: 345,
+          options: {
+            chart: {
+              width: 320
+            },
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }]
+      });
+      fetch(
+        {% if live %}
+        "/api/ticket/scan/dashboard/card_time_response_pie/?end_date={{ end_date|date:'Y-m-d' }}&agency_id={{ agency_id }}&live=true"
+        {% else %}
+        "/api/ticket/scan/dashboard/card_time_response_pie/?start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}&agency_id={{ agency_id }}"
+        {% endif %}
+      ).then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      }).then(data => {
+        chart.updateOptions(data.chart);
+        const start_date = new Date(data.start_date);
+        const end_date = new Date(data.end_date);
+        time_range_el.innerHTML = `(${mta.format.date_time.format(start_date)} <i class="fa-solid fa-arrow-right"></i> ${mta.format.date_time.format(end_date)})`
+      })
+      chart.render();
+
+    }
+  });
+</script>

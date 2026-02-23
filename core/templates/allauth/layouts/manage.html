@@ -1,0 +1,84 @@
+{% extends "layouts/base-page-fluid.html" %}
+{% load allauth %}
+{% block body %}
+<div class="page">
+    <!-- Navbar -->
+    {% block navigation %}
+      {% include 'includes/navigation.html' %}
+    {% endblock navigation %}
+    {% block sidebar %}
+      {% include 'includes/sidebar.html' %}
+    {% endblock sidebar %}
+    <div class="page-wrapper">
+      <div class="page-header d-print-none" aria-label="Page header">
+        <div class="container-xl">
+          <div class="row g-2 align-items-center">
+            <div class="col">
+              <h2 class="page-title">Account Settings</h2>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="page-body">
+        <div class="container-xl">
+          <div class="card">
+            <div class="row g-0">
+              <div class="col-12 col-md-3 border-end">
+                <div class="card-body">
+                  <div class="list-group list-group-transparent">
+                    {% url 'account_email' as email_url_ %}
+                    {% if email_url_ %}
+                            <a class="{% block nav_class_email %}list-group-item list-group-item-action {% endblock nav_class_email %}"
+                              href="{{ email_url_ }}">Change Email</a>
+                    {% endif %}
+                    {% url 'account_change_password' as change_password_url_ %}
+                    {% if change_password_url_ %}
+                            <a class="{% block nav_class_password %}list-group-item list-group-item-action {% endblock nav_class_password %}"
+                              href="{{ change_password_url_ }}">Change Password</a>
+                    {% endif %}
+                    {% url 'account_change_phone' as phone_url_ %}
+                    {% if phone_url_ %}
+                            <a class="{% block nav_class_phone %}list-group-item list-group-item-action {% endblock nav_class_phone %}"
+                              href="{{ phone_url_ }}">Change Phone</a>
+                    {% endif %}
+                    {% url 'socialaccount_connections' as connections_url_ %}
+                    {% if connections_url_ %}
+                            <a class="{% block nav_class_socialaccount %}list-group-item list-group-item-action {% endblock nav_class_socialaccount %}"
+                              href="{{ connections_url_ }}">Third-Party Accounts</a>
+                    {% endif %}
+                    {% url 'mfa_index' as mfa_index_url_ %}
+                    {% if mfa_index_url_ %}
+                            <a class="{% block nav_class_mfa %}list-group-item list-group-item-action {% endblock nav_class_mfa %}"
+                              href="{{ mfa_index_url_ }}">Two-Factor Authentication</a>
+                    {% endif %}
+                    {% url 'usersessions_list' as usersessions_list_url_ %}
+                    {% if usersessions_list_url_ %}
+                            <a class="{% block nav_class_usersessions %}list-group-item list-group-item-action {% endblock nav_class_usersessions %}"
+                              href="{{ usersessions_list_url_ }}">Sessions</a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 col-md-9 d-flex flex-column">
+                <div class="card-body" id="content" >
+                  {% if messages %}
+                    <div class="pt-4">
+                        {% for message in messages %}
+                            {% element alert level=message.tags %}
+                                {% slot message %}
+                                    {{ message }}
+                                {% endslot %}
+                            {% endelement %}
+                        {% endfor %}
+                    </div>
+                  {% endif %}
+                  {% block content %}{% endblock content %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock body %}

@@ -1,0 +1,101 @@
+# version: '3.8'
+services:
+  django:
+    # platform: "linux/amd64"
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: core_local_django
+    container_name: core_local_django
+    depends_on:
+      oracle-db:
+        condition: service_started
+      dynamodb:
+        condition: service_started
+      # - mailpit
+      node:
+        condition: service_started
+    volumes:
+      - /srv/.venv
+      - .:/srv:z
+    env_file:
+      - ./.envs/.local/.django
+      - ./.envs/.local/.oracle
+      - ./.env
+    # ports:
+    #   - "8001:8001" # Django http port
+    #   - "5678:5678" # debugPy port for vsCode
+    command: /start
+  oracle-db:
+    # image: gvenzl/oracle-free:latest # Using a readily available Oracle Free image
+    build:
+      context: .
+      dockerfile: ./compose/local/oracle/Dockerfile
+    container_name: oracle-database
+    ports:
+      - "0.0.0.0:1521:1521" # Host_port:Container_port for SQL*Net
+      - "0.0.0.0:5500:5500" # Optional: For EM Express or other management tools
+    environment:
+      ORACLE_PASSWORD: pyrnyq-voRjib-6sogde # Set a strong password
+      APP_USER: developer,mofa
+      APP_USER_PASSWORD: pyrnyq-voRjib-6sogde
+      # ORACLE_DATABASE: FAREGO
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "sqlplus",
+          "-L",
+          "sys/pyrnyq-voRjib-6sogde@//localhost:1521/FREEPDB1 as sysdba",
+          "@healthcheck.sql",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s # Gives the DB time to initialize before the first check
+
+    volumes:
+      - ./compose/local/oracle/healthcheck.sql:/healthcheck.sql
+      - oracle-data:/opt/oracle/oradata # Persist database data
+    restart: unless-stopped # Automatically restart the container unless explicitly stopped
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: mailpit
+    restart: unless-stopped
+    ports:
+      - "8025:8025" # Web UI
+      - "1025:1025" # SMTP server
+    volumes:
+      - mailpit-data:/app/data # Persistent storage for emails
+    environment:
+      - TZ=UTC # Set your desired timezone
+
+  dynamodb:
+    image: amazon/dynamodb-local
+    container_name: dynamodb
+    restart: unless-stopped
+    volumes:
+      - dynamodb-data:/home/dynamodblocal
+    ports:
+      - "8000:8000" # Dynamodb Gateway
+
+  node:
+    build:
+      context: .
+      dockerfile: ./compose/local/node/Dockerfile
+    image: core_local_node
+    container_name: core_local_node
+    volumes:
+      - .:/app:z
+      - /app/node_modules
+    command: npm run dev
+    environment:
+      - CHOKIDAR_USEPOLLING=true # Helps with docker container listenting to file changes
+    ports:
+      - "5173:5173" # Static asset gateway
+
+volumes:
+  oracle-data: # Define the named volume for data persistence
+  mailpit-data:
+  dynamodb-data:

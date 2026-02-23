@@ -1,0 +1,110 @@
+<div class="card" id="card-agency-line">
+  <div class="card-body pb-0">
+    <div class="subheader">Total Scans By Agency</div>
+    <div class="d-flex align-items-baseline">
+      <div class="h1 mb-0 me-2">
+        <span class="data-this-month">0</span>
+      </div>
+      <div class="me-auto">
+        <span class="d-inline-flex align-items-center lh-1 data-diff-percent">0%</span>
+      </div>
+    </div>
+    <div class="text-secondary mt-2">
+      <span class="data-diff">0</span>
+    </div>
+  </div>
+  <div class="position-relative apex-chart-wrapper mx-3"></div>
+</div>
+<script type="module">
+
+  document.addEventListener("DOMContentLoaded", function() {
+    if (window.ApexCharts) {
+      const card = document.getElementById("card-agency-line");
+      const chart_el = card.querySelector(".apex-chart-wrapper");
+      const data_diff_el = card.querySelector(".data-diff");
+      const data_this_month_el = card.querySelector(".data-this-month");
+      const data_diff_percent_el = card.querySelector(".data-diff-percent");
+
+      const chart = new ApexCharts(chart_el, {
+        chart: {
+          type: "line",
+          fontFamily: "inherit",
+          height: 200,
+          /*sparkline: {
+            enabled: true,
+          },*/
+          animations: {
+            enabled: true,
+          },
+        },
+        stroke: {
+          width: [2, 1],
+          dashArray: [0, 3],
+          lineCap: "round",
+          curve: "smooth",
+        },
+        series: [],
+        tooltip: {
+          enabled: true,
+          shared: true,
+          intersect: false,
+          //theme: "dark",
+        },
+        grid: {
+          strokeDashArray: 4,
+        },
+        xaxis: {
+          labels: {
+            padding: 0,
+          },
+          tooltip: {
+            enabled: true,
+            shared: true,
+            intersect: false,
+          },
+          type: "datetime",
+        },
+        /*yaxis: {
+          labels: {
+            padding: 4,
+          },
+        },*/
+        noData: {
+          text: "Loading..."
+        },
+        // labels: [],
+        // colors: ["color-mix(in srgb, transparent, var(--tblr-primary) 100%)", "color-mix(in srgb, transparent, var(--tblr-gray-400) 100%)"],
+        /*legend: {
+          show: true,
+        },*/
+      });
+      fetch("/api/ticket/scan/dashboard/card_agency_line/?start_date={{ start_date|date:'Y-m-d' }}&end_date={{ end_date|date:'Y-m-d' }}").then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      }).then(data => {
+        chart.updateOptions(data.chart);
+        const last_start = new Date(data.last.start);
+        const last_end = new Date(data.last.end);
+        const last_period = `<small class="fw-bold">(${mta.format.date_time.format(last_start)} -> ${mta.format.date_time.format(last_end)})</small>`;
+        if (data.diff > 0) {
+          data_diff_el.innerHTML = `${data.diff.toLocaleString('en-US')} scans increased from previous period ${last_period}`;
+        } else {
+          data_diff_el.innerHTML = `${data.diff.toLocaleString('en-US')} scans decreased from previous period ${last_period}`;
+        }
+        data_this_month_el.innerHTML = data.this_month.toLocaleString('en-US');
+        data_diff_percent_el.classList.remove("text-green", "text-red")
+        if (data.diff_percent > 0) {
+          data_diff_percent_el.innerHTML = `${data.diff_percent.toLocaleString('en-US')}% <i class="fa-solid fa-arrow-trend-up ps-2"></i>`;
+          data_diff_percent_el.classList.add("text-green");
+        } else if (data.diff_percent < 0) {
+          data_diff_percent_el.innerHTML = `${data.diff_percent.toLocaleString('en-US')}% <i class="fa-solid fa-arrow-trend-down ps-2"></i>`;
+          data_diff_percent_el.classList.add("text-red");
+        }
+      })
+      chart.render();
+
+    }
+  });
+</script>
